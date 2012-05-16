@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://xmlapi.alcatel.com/phonesetprogramming" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://xmlapi.alcatel.com/phonesetprogramming" xmlns:intf="http://xmlapi.alcatel.com/phonesetprogramming" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns1="http://xmlapi.alcatel.com/phonesetprogramming/types" xmlns:tns3="http://xmlapi.alcatel.com/common" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	
+	<wsdl:types>
+		<schema targetNamespace="http://xmlapi.alcatel.com/common" xmlns="http://www.w3.org/2001/XMLSchema">
+		
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+		
+			<simpleType name="AlcServiceError">
+				<restriction base="xsd:string">
+					<enumeration value="BAD_DATA_ACCESS_CONNECTION"/>
+					<enumeration value="BAD_FRAMEWORK_SESSION_IDENTIFIER"/>
+					<enumeration value="INVALID_OPERATION"/>
+					<enumeration value="INVALID_SVC_SESSION_ID"/>
+					<enumeration value="LICENSE_REQUIRED"/>
+					<enumeration value="LOGIN_REQUIRED"/>
+					<enumeration value="SERVICE_UNAVAILABLE"/>
+					<enumeration value="SOAP_ACTION_REQUIRED"/>
+					<enumeration value="BAD_PARAMETER_VALUE"/>
+					<enumeration value="UNAUTHORIZED"/>
+				</restriction>
+			</simpleType>
+			
+			<complexType name="AlcServiceException">
+				<sequence>
+					<element name="fault" nillable="true" type="tns3:AlcServiceError"/>
+				</sequence>
+			</complexType>
+			
+		</schema>
+		
+		<schema targetNamespace="http://xmlapi.alcatel.com/phonesetprogramming/types" xmlns="http://www.w3.org/2001/XMLSchema">
+		
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+			
+			<simpleType name="AlcPhoneSetProgrammingError">
+				<restriction base="xsd:string">
+					<enumeration value="ADMINISTRATION_ERROR"/>
+					<enumeration value="UPK_REFRESH_REQUIRED"/>
+					<enumeration value="PBX_LINK_NOT_CONNECTED"/>
+					<enumeration value="UNKNOWN_LINE"/>
+					<enumeration value="UNKNOWN_ERROR"/>
+					<enumeration value="NOT_AUTHORIZED"/>
+					<enumeration value="ACAPI_ERROR"/>
+					<enumeration value="INVALID_SECRET_CODE"/>
+					<enumeration value="INVALID_PARAMETER"/>
+					<enumeration value="OUT_OF_BOUND"/>
+					<enumeration value="NOT_IMPLEMENTED"/>
+				</restriction>
+			</simpleType>
+			
+			<complexType name="AlcPhoneSetProgrammingException">
+				<sequence>
+					<element name="fault" nillable="true" type="tns1:AlcPhoneSetProgrammingError"/>
+				</sequence>
+			</complexType>
+			
+			<complexType name="AlcPhoneSetProgrammingCapabilities">
+				<sequence>
+					<element name="associateModification" type="xsd:boolean"/>
+					<element name="campon" type="xsd:boolean"/>
+					<element name="cancelForward" type="xsd:boolean"/>
+					<element name="cancelOverflow" type="xsd:boolean"/>
+					<element name="clickAndDial" type="xsd:boolean"/>
+					<element name="doNotDisturb" type="xsd:boolean"/>
+					<element name="forwardOnBusy" type="xsd:boolean"/>
+					<element name="forwardOnBusyOrNoAnswer" type="xsd:boolean"/>
+					<element name="forwardOnNoAnswer" type="xsd:boolean"/>
+					<element name="immediateForward" type="xsd:boolean"/>
+					<element name="lock" type="xsd:boolean"/>
+					<element name="overflowOnBusy" type="xsd:boolean"/>
+					<element name="overflowOnBusyOrNoAnswer" type="xsd:boolean"/>
+					<element name="overflowOnNoAnswer" type="xsd:boolean"/>
+					<element name="sdk" type="xsd:boolean"/>
+					<element name="secretCodeModification" type="xsd:boolean"/>
+					<element name="upk" type="xsd:boolean"/>
+				</sequence>
+			</complexType>
+			
+			<simpleType name="AlcAddOnType">
+				<restriction base="xsd:string">
+					<enumeration value="NO_EXTENSION"/>
+					<enumeration value="ADD_ON_10_KEYS"/>
+					<enumeration value="ADD_ON_16_KEYS"/>
+					<enumeration value="ADD_ON_20_KEYS"/>
+					<enumeration value="ADD_ON_40_KEYS"/>
+					<enumeration value="ADD_ON_EL_14_KEYS"/>
+					<enumeration value="UNDEFINED"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcPhoneSetInfo">
+				<sequence>
+					<element name="language" type="xsd:string"/>
+					<element name="phoneSetType" type="xsd:string"/>
+					<element name="addOnInfo" type="impl:ArrayOf_tns1_AlcAddOnType"/>
+					
+				</sequence>
+			</complexType>
+			
+			<complexType name="AlcServicePrefixes">
+				<sequence>
+					<element name="cancelAutoCallbackPfx" type="xsd:string"/>
+					<element name="cancelOverflowPfx" type="xsd:string"/>
+					<element name="cancelWakeUpPfx" type="xsd:string"/>
+					<element name="cancelForwardPfx" type="xsd:string"/>
+					<element name="directCallPickUpPfx" type="xsd:string"/>
+					<element name="doNotDisturbPfx" type="xsd:string"/>
+					<element name="forwardOnBusyOrNoAnswerPfx" type="xsd:string"/>
+					<element name="forwardOnNoAnswerPfx" type="xsd:string"/>
+					<element name="groupCallPickUpPfx" type="xsd:string"/>
+					<element name="immediateForwardPfx" type="xsd:string"/>
+					<element name="forwardOnBusyPfx" type="xsd:string"/>
+					<element name="overflowOnAssociatePfx" type="xsd:string"/>
+					<element name="padlockPfx" type="xsd:string"/>
+					<element name="speedDialAssociatePfx" type="xsd:string"/>
+					<element name="wakeUpPfx" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			
+			<simpleType name="AlcForwardType">
+				<restriction base="xsd:string">
+					<enumeration value="NO_FORWARD"/>
+					<enumeration value="IMMEDIATE"/>
+					<enumeration value="ON_BUSY"/>
+					<enumeration value="ON_NO_ANSWER"/>
+					<enumeration value="ON_BUSY_OR_NO_ANSWER"/>
+				</restriction>
+			</simpleType>
+
+			<simpleType name="AlcForwardTargetType">
+				<restriction base="xsd:string">
+					<enumeration value="NONE"/>
+					<enumeration value="NUMBER"/>
+					<enumeration value="VOICE_MAIL"/>
+					<enumeration value="ROUTING_SERVICE"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcForwardState">
+				<sequence>
+					<element name="type" nillable="true" type="tns1:AlcForwardType"/>
+					<element name="targetNumber" nillable="true" type="xsd:string"/>
+					<element name="firstName" nillable="true" type="xsd:string"/>
+					<element name="name" nillable="true" type="xsd:string"/>
+					<element name="targetType" nillable="true" type="tns1:AlcForwardTargetType"/>
+				</sequence>
+			</complexType>
+			
+			<simpleType name="AlcOverflowType">
+				<restriction base="xsd:string">
+					<enumeration value="NO_OVERFLOW"/>
+					<enumeration value="ON_BUSY"/>
+					<enumeration value="ON_NO_ANSWER"/>
+					<enumeration value="ON_BUSY_OR_NO_ANSWER"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcStaticState">
+				<sequence>
+					<element name="campOnActivated" type="xsd:boolean"/>
+					<element name="doNotDisturbActivated" type="xsd:boolean"/>
+					<element name="forwardState" nillable="true" type="tns1:AlcForwardState"/>
+					<element name="locked" type="xsd:boolean"/>
+					<element name="overflowType" nillable="true" type="tns1:AlcOverflowType"/>
+					<element name="associate" nillable="true" type="xsd:string"/>
+				</sequence>
+			</complexType>
+			
+			<complexType name="AlcSpeedDialingKey">
+				<sequence>
+					<element name="label" nillable="true" type="xsd:string"/>
+					<element name="number" nillable="true" type="xsd:string"/>
+					<element name="position" type="xsd:int"/>
+				</sequence>
+			</complexType>
+			
+			<simpleType name="AlcUpkType">
+				<restriction base="xsd:string">
+					<enumeration value="NOT_ASSIGNED"/>
+					<enumeration value="PROGRAMMED"/>
+					<enumeration value="VIDEO"/>
+					<enumeration value="REMOTE_WATCH"/>
+					<enumeration value="BOSS_MAIL"/>
+					<enumeration value="FORWARDING_ON_RING"/>
+					<enumeration value="ABSENT_SECRETARY"/>
+					<enumeration value="SCREENING_KEY"/>
+					<enumeration value="UNSCREENING_KEY"/>
+					<enumeration value="TRUNK_GROUP_SUPERVISION"/>
+					<enumeration value="TRUNK_SUPERVISION"/>
+					<enumeration value="STATION_SUPERVISION"/>
+					<enumeration value="SECRETARY_CALL"/>
+					<enumeration value="EXECUTIVE_CALL"/>
+					<enumeration value="MULTI_DIRECTORY_NUMBER"/>
+					<enumeration value="ROUTING_SECRETARY"/>
+					<enumeration value="ACD_STATE"/>
+					<enumeration value="ACD_LISTENING"/>
+					<enumeration value="ACD_GENERAL_FORWARDING"/>
+					<enumeration value="HEADSET"/>
+					<enumeration value="DATA"/>
+					<enumeration value="ISDN_FILTERING_KEY"/>
+					<enumeration value="ROUTER_SUPERVISION"/>
+					<enumeration value="SCREENING_SUPERVISION"/>
+					<enumeration value="SPK_ENQUIRY"/>
+					<enumeration value="SPK_BROKER"/>
+					<enumeration value="SPK_FORWARD"/>
+					<enumeration value="SPK_REDIAL_BIS"/>
+					<enumeration value="SPK_MAIL"/>
+					<enumeration value="SPK_REDIAL_MEM"/>
+					<enumeration value="SPK_TRANSFER"/>
+					<enumeration value="SPK_ISDN"/>
+					<enumeration value="SPK_REPERT"/>
+					<enumeration value="SPK_BOOKING"/>
+					<enumeration value="SPK_THREE_PARTY_CONFERENCE"/>
+					<enumeration value="SPK_INTRUDE"/>
+					<enumeration value="SPK_WAITING_CAMP_ON"/>
+					<enumeration value="SPK_LOUDSPEAKER_PAGING"/>
+					<enumeration value="SPK_CALL_ANNOUNCEMENT"/>
+					<enumeration value="SPK_PAGING_REQUEST"/>
+					<enumeration value="SPK_PROJECT_NUMBER_SUFFIX"/>
+					<enumeration value="SPK_DECIMAL_END_TO_END_SIGNALING"/>
+					<enumeration value="SPK_DTMF_END_TO_END_SIGNALING"/>
+					<enumeration value="SPK_MALICIOUS_CALL_TRACE"/>
+					<enumeration value="SPK_VOICE_MAIL_MESSAGE_DEPOSIT"/>
+					<enumeration value="SPK_CAMP_ON_CONTROL"/>
+					<enumeration value="SPK_VOICE_MAIL_CONSULT"/>
+					<enumeration value="NETWORK_EXECUTIVE_CALL"/>
+					<enumeration value="NETWORK_SECRETARY_CALL"/>
+					<enumeration value="NETWORK_NOT_ASSIGNED"/>
+					<enumeration value="NETWORK_RISO"/>
+					<enumeration value="ACD_GEN_FORW_PG"/>
+					<enumeration value="ACD_CLOSURE_PG"/>
+					<enumeration value="OPERATOR_ASSISTANCE"/>
+					<enumeration value="ACD_CNX_PERM"/>
+					<enumeration value="SUP_PARALLEL_SET"/>
+					<enumeration value="MLA"/>
+					<enumeration value="SMLA"/>
+					<enumeration value="SUPMEVO"/>
+					<enumeration value="ACD_LINE"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcUserProgrammableKey">
+				<sequence>
+					<element name="locked" type="xsd:boolean"/>
+					<element name="mnemonic" nillable="true" type="xsd:string"/>
+					<element name="number" nillable="true" type="xsd:string"/>
+					<element name="position" type="xsd:int"/>
+					<element name="secretarySecondNumber" nillable="true" type="xsd:string"/>
+					<element name="type" nillable="true" type="tns1:AlcUpkType"/>
+				</sequence>
+			</complexType>
+			
+		</schema>
+		
+		<schema targetNamespace="http://xmlapi.alcatel.com/phonesetprogramming" xmlns="http://www.w3.org/2001/XMLSchema">
+		
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+			
+			<complexType name="ArrayOf_tns1_AlcSpeedDialingKey">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:AlcSpeedDialingKey[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+			
+			<complexType name="ArrayOf_tns1_AlcUserProgrammableKey">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:AlcUserProgrammableKey[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="ArrayOf_xsd_string">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="ArrayOf_tns1_AlcAddOnType">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:AlcAddOnType[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+			
+			
+		</schema>
+		
+	</wsdl:types>
+	
+	
+	
+	<!-- AlcServiceException -->
+	<wsdl:message name="AlcServiceException">
+		<wsdl:part name="fault" type="tns3:AlcServiceException"/>
+	</wsdl:message>
+
+	<!-- AlcPhoneSetProgrammingException -->
+	<wsdl:message name="AlcPhoneSetProgrammingException">
+		<wsdl:part name="pspFault" type="tns1:AlcPhoneSetProgrammingException"/>
+	</wsdl:message>
+	
+	<!-- setCurrentLine -->
+	<wsdl:message name="setCurrentLine">
+		<wsdl:part name="pLineNumber" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="setCurrentLineResponse">
+	</wsdl:message>
+
+	<!-- getPhoneSetProgrammingCapabilities -->
+	<wsdl:message name="getPhoneSetProgrammingCapabilities">
+	</wsdl:message>
+	<wsdl:message name="getPhoneSetProgrammingCapabilitiesResponse">
+		<wsdl:part name="getPhoneSetProgrammingCapabilitiesReturn" type="tns1:AlcPhoneSetProgrammingCapabilities"/>
+	</wsdl:message>
+
+	<!-- getPhoneSetInfo -->
+	<wsdl:message name="getPhoneSetInfo">
+	</wsdl:message>
+	<wsdl:message name="getPhoneSetInfoResponse">
+		<wsdl:part name="getPhoneSetInfoReturn" type="tns1:AlcPhoneSetInfo"/>
+	</wsdl:message>
+
+	<!-- getServicePrefixes -->
+	<wsdl:message name="getServicePrefixes">
+	</wsdl:message>
+	<wsdl:message name="getServicePrefixesResponse">
+		<wsdl:part name="getServicePrefixesReturn" type="tns1:AlcServicePrefixes"/>
+	</wsdl:message>
+
+	<!-- getStaticState -->
+	<wsdl:message name="getStaticState">
+	</wsdl:message>
+	<wsdl:message name="getStaticStateResponse">
+		<wsdl:part name="getStaticStateReturn" type="tns1:AlcStaticState"/>
+	</wsdl:message>
+
+	<!-- setLockState -->
+	<wsdl:message name="setLockState">
+		<wsdl:part name="pLocked" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="setLockStateResponse">
+	</wsdl:message>
+
+	<!-- setDoNotDisturbState -->
+	<wsdl:message name="setDoNotDisturbState">
+		<wsdl:part name="pDoNotDisturbActivated" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="setDoNotDisturbStateResponse">
+	</wsdl:message>
+
+	<!-- setCampOnState -->
+	<wsdl:message name="setCampOnState">
+		<wsdl:part name="pCampOnActivated" type="xsd:boolean"/>
+	</wsdl:message>
+	<wsdl:message name="setCampOnStateResponse">
+	</wsdl:message>
+
+	<!-- setForwardState -->
+	<wsdl:message name="setForwardState">
+		<wsdl:part name="pForwardState" type="tns1:AlcForwardState"/>
+	</wsdl:message>
+	<wsdl:message name="setForwardStateResponse">
+	</wsdl:message>
+
+	<!-- setOverflowType -->
+	<wsdl:message name="setOverflowType">
+		<wsdl:part name="pOverflowType" type="tns1:AlcOverflowType"/>
+	</wsdl:message>
+	<wsdl:message name="setOverflowTypeResponse">
+	</wsdl:message>
+	
+	<!-- setAssociate -->
+	<wsdl:message name="setAssociate">
+		<wsdl:part name="pAssociatedNumber" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="setAssociateResponse">
+	</wsdl:message>
+
+	<!-- getSdkList -->
+	<wsdl:message name="getSdkList">
+	</wsdl:message>
+	<wsdl:message name="getSdkListResponse">
+		<wsdl:part name="getSdkListReturn" type="impl:ArrayOf_tns1_AlcSpeedDialingKey"/>
+	</wsdl:message>
+
+	<!-- getSdk -->
+	<wsdl:message name="getSdk">
+		<wsdl:part name="pPosition" type="xsd:int"/>
+	</wsdl:message>
+	<wsdl:message name="getSdkResponse">
+		<wsdl:part name="getSdkReturn" type="tns1:AlcSpeedDialingKey"/>
+	</wsdl:message>
+
+	<!-- setSdk -->
+	<wsdl:message name="setSdk">
+		<wsdl:part name="pSdk" type="tns1:AlcSpeedDialingKey"/>
+	</wsdl:message>
+	<wsdl:message name="setSdkResponse">
+	</wsdl:message>
+
+	<!-- getUpkList -->
+	<wsdl:message name="getUpkList">
+	</wsdl:message>
+	<wsdl:message name="getUpkListResponse">
+		<wsdl:part name="getUpkListReturn" type="impl:ArrayOf_tns1_AlcUserProgrammableKey"/>
+	</wsdl:message>
+
+	<!-- getUpk -->
+	<wsdl:message name="getUpk">
+		<wsdl:part name="pPosition" type="xsd:int"/>
+	</wsdl:message>
+	<wsdl:message name="getUpkResponse">
+		<wsdl:part name="getUpkReturn" type="tns1:AlcUserProgrammableKey"/>
+	</wsdl:message>
+
+	<!-- setUpk -->
+	<wsdl:message name="setUpk">
+		<wsdl:part name="pUpk" type="tns1:AlcUserProgrammableKey"/>
+	</wsdl:message>
+	<wsdl:message name="setUpkResponse">
+	</wsdl:message>
+
+	<!-- changeSecretCode -->
+	<wsdl:message name="changeSecretCode">
+		<wsdl:part name="pOldSecretCode" type="xsd:string"/>
+		<wsdl:part name="pNewSecretCode" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="changeSecretCodeResponse">
+	</wsdl:message>
+
+	<!-- clickAndDial -->
+	<wsdl:message name="clickAndDial">
+		<wsdl:part name="pCalledNumber" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="clickAndDialResponse">
+	</wsdl:message>
+
+
+
+
+
+
+
+
+	<wsdl:portType name="XmlPhoneSetProgramming">
+
+		<wsdl:operation name="setCurrentLine" parameterOrder="pLineNumber">
+			<wsdl:input message="impl:setCurrentLine" name="setCurrentLine"/>
+			<wsdl:output message="impl:setCurrentLineResponse" name="setCurrentLineResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getPhoneSetProgrammingCapabilities">
+			<wsdl:input message="impl:getPhoneSetProgrammingCapabilities" name="getPhoneSetProgrammingCapabilities"/>
+			<wsdl:output message="impl:getPhoneSetProgrammingCapabilitiesResponse" name="getPhoneSetProgrammingCapabilitiesResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getPhoneSetInfo">
+			<wsdl:input message="impl:getPhoneSetInfo" name="getPhoneSetInfo"/>
+			<wsdl:output message="impl:getPhoneSetInfoResponse" name="getPhoneSetInfoResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getServicePrefixes">
+			<wsdl:input message="impl:getServicePrefixes" name="getServicePrefixes"/>
+			<wsdl:output message="impl:getServicePrefixesResponse" name="getServicePrefixesResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getStaticState">
+			<wsdl:input message="impl:getStaticState" name="getStaticState"/>
+			<wsdl:output message="impl:getStaticStateResponse" name="getStaticStateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setLockState" parameterOrder="pLocked">
+			<wsdl:input message="impl:setLockState" name="setLockState"/>
+			<wsdl:output message="impl:setLockStateResponse" name="setLockStateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setDoNotDisturbState" parameterOrder="pDoNotDisturbActivated">
+			<wsdl:input message="impl:setDoNotDisturbState" name="setDoNotDisturbState"/>
+			<wsdl:output message="impl:setDoNotDisturbStateResponse" name="setDoNotDisturbStateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setCampOnState" parameterOrder="pCampOnActivated">
+			<wsdl:input message="impl:setCampOnState" name="setCampOnState"/>
+			<wsdl:output message="impl:setCampOnStateResponse" name="setCampOnStateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setForwardState" parameterOrder="pForwardState">
+			<wsdl:input message="impl:setForwardState" name="setForwardState"/>
+			<wsdl:output message="impl:setForwardStateResponse" name="setForwardStateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setOverflowType" parameterOrder="pOverflowType">
+			<wsdl:input message="impl:setOverflowType" name="setOverflowType"/>
+			<wsdl:output message="impl:setOverflowTypeResponse" name="setOverflowTypeResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setAssociate" parameterOrder="pAssociatedNumber">
+			<wsdl:input message="impl:setAssociate" name="setAssociate"/>
+			<wsdl:output message="impl:setAssociateResponse" name="setAssociateResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSdkList">
+			<wsdl:input message="impl:getSdkList" name="getSdkList"/>
+			<wsdl:output message="impl:getSdkListResponse" name="getSdkListResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSdk" parameterOrder="pPosition">
+			<wsdl:input message="impl:getSdk" name="getSdk"/>
+			<wsdl:output message="impl:getSdkResponse" name="getSdkResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setSdk" parameterOrder="pSdk">
+			<wsdl:input message="impl:setSdk" name="setSdk"/>
+			<wsdl:output message="impl:setSdkResponse" name="setSdkResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getUpkList">
+			<wsdl:input message="impl:getUpkList" name="getUpkList"/>
+			<wsdl:output message="impl:getUpkListResponse" name="getUpkListResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="getUpk" parameterOrder="pPosition">
+			<wsdl:input message="impl:getUpk" name="getUpk"/>
+			<wsdl:output message="impl:getUpkResponse" name="getUpkResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="setUpk" parameterOrder="pUpk">
+			<wsdl:input message="impl:setUpk" name="setUpk"/>
+			<wsdl:output message="impl:setUpkResponse" name="setUpkResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="changeSecretCode" parameterOrder="pOldSecretCode pNewSecretCode">
+			<wsdl:input message="impl:changeSecretCode" name="changeSecretCode"/>
+			<wsdl:output message="impl:changeSecretCodeResponse" name="changeSecretCodeResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="clickAndDial" parameterOrder="pCalledNumber">
+			<wsdl:input message="impl:clickAndDial" name="clickAndDial"/>
+			<wsdl:output message="impl:clickAndDialResponse" name="clickAndDialResponse"/>
+			<wsdl:fault message="impl:AlcServiceException" name="AlcServiceException"/>
+			<wsdl:fault message="impl:AlcPhoneSetProgrammingException" name="AlcPhoneSetProgrammingException"/>
+		</wsdl:operation>
+
+	</wsdl:portType>
+
+
+
+
+
+
+	<wsdl:binding name="XmlPhoneSetProgrammingSoapBinding" type="impl:XmlPhoneSetProgramming">
+		<wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		
+		<wsdl:operation name="setCurrentLine">
+			<wsdlsoap:operation soapAction="setCurrentLine"/>
+			<wsdl:input name="setCurrentLine"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setCurrentLineResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getPhoneSetProgrammingCapabilities">
+			<wsdlsoap:operation soapAction="getPhoneSetProgrammingCapabilities"/>
+			<wsdl:input name="getPhoneSetProgrammingCapabilities"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getPhoneSetProgrammingCapabilitiesResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getPhoneSetInfo">
+			<wsdlsoap:operation soapAction="getPhoneSetInfo"/>
+			<wsdl:input name="getPhoneSetInfo"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getPhoneSetInfoResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getServicePrefixes">
+			<wsdlsoap:operation soapAction="getServicePrefixes"/>
+			<wsdl:input name="getServicePrefixes"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getServicePrefixesResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getStaticState">
+			<wsdlsoap:operation soapAction="getStaticState"/>
+			<wsdl:input name="getStaticState"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getStaticStateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setLockState">
+			<wsdlsoap:operation soapAction="setLockState"/>
+			<wsdl:input name="setLockState"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setLockStateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setDoNotDisturbState">
+			<wsdlsoap:operation soapAction="setDoNotDisturbState"/>
+			<wsdl:input name="setDoNotDisturbState"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setDoNotDisturbStateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setCampOnState">
+			<wsdlsoap:operation soapAction="setCampOnState"/>
+			<wsdl:input name="setCampOnState"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setCampOnStateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setForwardState">
+			<wsdlsoap:operation soapAction="setForwardState"/>
+			<wsdl:input name="setForwardState"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setForwardStateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setOverflowType">
+			<wsdlsoap:operation soapAction="setOverflowType"/>
+			<wsdl:input name="setOverflowType"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setOverflowTypeResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setAssociate">
+			<wsdlsoap:operation soapAction="setAssociate"/>
+			<wsdl:input name="setAssociate"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setAssociateResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getSdkList">
+			<wsdlsoap:operation soapAction="getSdkList"/>
+			<wsdl:input name="getSdkList"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getSdkListResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getSdk">
+			<wsdlsoap:operation soapAction="getSdk"/>
+			<wsdl:input name="getSdk"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getSdkResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setSdk">
+			<wsdlsoap:operation soapAction="setSdk"/>
+			<wsdl:input name="setSdk"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setSdkResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getUpkList">
+			<wsdlsoap:operation soapAction="getUpkList"/>
+			<wsdl:input name="getUpkList"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getUpkListResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getUpk">
+			<wsdlsoap:operation soapAction="getUpk"/>
+			<wsdl:input name="getUpk"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="getUpkResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="setUpk">
+			<wsdlsoap:operation soapAction="setUpk"/>
+			<wsdl:input name="setUpk"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="setUpkResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="changeSecretCode">
+			<wsdlsoap:operation soapAction="changeSecretCode"/>
+			<wsdl:input name="changeSecretCode"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="changeSecretCodeResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="clickAndDial">
+			<wsdlsoap:operation soapAction="clickAndDial"/>
+			<wsdl:input name="clickAndDial"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:input>
+			<wsdl:output name="clickAndDialResponse"><wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:output>
+			<wsdl:fault name="AlcServiceException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+			<wsdl:fault name="AlcPhoneSetProgrammingException"><wsdlsoap:fault encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phonesetprogramming" use="encoded"/></wsdl:fault>
+		</wsdl:operation>
+		
+	</wsdl:binding>
+
+
+
+
+
+
+	<wsdl:service name="XmlPhoneSetProgrammingService">
+		<wsdl:port binding="impl:XmlPhoneSetProgrammingSoapBinding" name="XmlPhoneSetProgramming">
+			<wsdlsoap:address location="http://localhost:8080/api/services/2.2/XMLPhoneSetProgramming"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libOmniPCXStarter/xmlphonesetprogramming.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libOmniPCXStarter/XmlPhoneStarterApp.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libMailActivation/activation.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libMailActivation/mail.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/axis.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/commons-discovery.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/commons-logging.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/log4j.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/saaj.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/ws.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/wsdl4j.jar"/>
+	<classpathentry kind="lib" path="D:/Eclipse with Android/MakeCall-projekt/libAxis/xerces.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

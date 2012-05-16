@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+	targetNamespace="http://xmlapi.alcatel.com/phone" 
+	xmlns:impl="http://xmlapi.alcatel.com/phone" 
+	xmlns:tns1="http://xmlapi.alcatel.com/phonesetprogramming/types"
+	xmlns:intf="http://xmlapi.alcatel.com/phone" 
+	xmlns:apachesoap="http://xml.apache.org/xml-soap" 
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+
+	<wsdl:types>
+
+		<schema 
+			xmlns="http://www.w3.org/2001/XMLSchema" 
+			targetNamespace="http://xmlapi.alcatel.com/phone">
+			
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+			<simpleType name="CallState">
+				<restriction base="xsd:string">
+					<enumeration value="init"/>
+					<enumeration value="ringingIncoming"/>
+					<enumeration value="ringingOutgoing"/>
+					<enumeration value="active"/>
+					<enumeration value="held"/>
+					<enumeration value="conferenced"/>
+					<enumeration value="recording"/>
+					<enumeration value="waiting"/>
+					<enumeration value="dialing"/>
+					<enumeration value="releasing"/>
+					<enumeration value="unknown"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="Call">
+				<sequence>
+					<element name="callRef" type="xsd:long"/>
+					<element name="number" type="xsd:string"/>
+					<element name="name" type="xsd:string"/>
+					<element name="state" type="impl:CallState"/>
+					<element name="correlator" type="xsd:hexBinary"/>
+				</sequence>
+			</complexType>
+
+			<complexType name="ArrayOfCall">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="impl:Call[]"/>
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<xsd:simpleType name="NomadMode">
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="privatePhone"/>
+					<xsd:enumeration value="local"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+
+		</schema>
+
+		<schema 
+			xmlns="http://www.w3.org/2001/XMLSchema" 
+			targetNamespace="http://xmlapi.alcatel.com/phonesetprogramming/types">
+
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+			<simpleType name="AlcForwardType">
+				<restriction base="xsd:string">
+					<enumeration value="NO_FORWARD"/>
+					<enumeration value="IMMEDIATE"/>
+					<enumeration value="ON_BUSY"/>
+					<enumeration value="ON_NO_ANSWER"/>
+					<enumeration value="ON_BUSY_OR_NO_ANSWER"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcForwardState">
+				<sequence>
+					<element name="firstName" nillable="true" type="xsd:string"/>
+					<element name="forwardedToVoicemail" type="xsd:boolean"/>
+					<element name="name" nillable="true" type="xsd:string"/>
+					<element name="targetNumber" nillable="true" type="xsd:string"/>
+					<element name="type" nillable="true" type="tns1:AlcForwardType"/>
+				</sequence>
+			</complexType>
+			
+			<simpleType name="AlcOverflowType">
+				<restriction base="xsd:string">
+					<enumeration value="NO_OVERFLOW"/>
+					<enumeration value="ON_BUSY"/>
+					<enumeration value="ON_NO_ANSWER"/>
+					<enumeration value="ON_BUSY_OR_NO_ANSWER"/>
+				</restriction>
+			</simpleType>
+
+			<complexType name="AlcStaticState">
+				<sequence>
+					<element name="campOnActivated" type="xsd:boolean"/>
+					<element name="doNotDisturbActivated" type="xsd:boolean"/>
+					<element name="forwardState" nillable="true" type="tns1:AlcForwardState"/>
+					<element name="locked" type="xsd:boolean"/>
+					<element name="overflowType" nillable="true" type="tns1:AlcOverflowType"/>
+				</sequence>
+			</complexType>
+			
+		</schema>
+
+	</wsdl:types>
+
+	<wsdl:message name="onSessionClosed">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="onSessionClosedResponse">
+	</wsdl:message>
+
+	<wsdl:message name="onCallState">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+		<wsdl:part name="calls" type="impl:ArrayOfCall"/>
+	</wsdl:message>
+	<wsdl:message name="onCallStateResponse">
+	</wsdl:message>
+
+	<wsdl:message name="onNewSession">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="onNewSessionResponse">
+	</wsdl:message>
+
+	<wsdl:message name="onConnectionDown">
+	</wsdl:message>
+	<wsdl:message name="onConnectionDownResponse">
+	</wsdl:message>
+	
+	<wsdl:message name="onPhoneSetStaticState">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+		<wsdl:part name="state" type="tns1:AlcStaticState"/>
+	</wsdl:message>
+	<wsdl:message name="onPhoneSetStaticStateResponse">
+	</wsdl:message>
+	
+	<wsdl:message name="onUnansweredCall">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="onUnansweredCallResponse">
+	</wsdl:message>
+	
+	<wsdl:message name="onNomadState">
+		<wsdl:part name="sessionId" type="xsd:string"/>
+		<wsdl:part name="mode" type="impl:NomadMode"/>
+		<wsdl:part name="homeNumber" type="xsd:string"/>
+	</wsdl:message>
+	<wsdl:message name="onNomadStateResponse">
+	</wsdl:message>
+	
+	
+
+	
+
+
+
+	<wsdl:portType name="XmlPhoneEvents">
+		
+		<wsdl:operation name="onCallState" parameterOrder="sessionId calls">
+			<documentation>This notification is sent each time a call's state has changed.</documentation>
+			<wsdl:input name="onCallState" message="impl:onCallState"/>
+			<wsdl:output name="onCallStateResponse" message="impl:onCallStateResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="onNewSession" parameterOrder="sessionId">
+			<documentation>This notification is sent when another XmlPhone session has been opened for the same user.</documentation>
+			<wsdl:input name="onNewSession" message="impl:onNewSession"/>
+			<wsdl:output name="onNewSessionResponse" message="impl:onNewSessionResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="onSessionClosed" parameterOrder="sessionId">
+			<documentation>This notification is sent when the XmlPhone session has been closed after a timeout.</documentation>
+			<wsdl:input name="onSessionClosed" message="impl:onSessionClosed"/>
+			<wsdl:output name="onSessionClosedResponse" message="impl:onSessionClosedResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="onConnectionDown">
+			<documentation>This notification is sent when the event connection with the OTS service is broken.</documentation>
+			<wsdl:input name="onConnectionDown" message="impl:onConnectionDown"/>
+			<wsdl:output name="onConnectionDownResponse" message="impl:onConnectionDownResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="onPhoneSetStaticState" parameterOrder="sessionId state">
+			<documentation>This notification is sent each time the static state of the phone set changes.</documentation>
+			<wsdl:input name="onPhoneSetStaticState" message="impl:onPhoneSetStaticState"/>
+			<wsdl:output name="onPhoneSetStaticStateResponse" message="impl:onPhoneSetStaticStateResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="onUnansweredCall" parameterOrder="sessionId">
+			<documentation>This notification is sent each time a new incoming call has been unanswered : consult the call log.</documentation>
+			<wsdl:input name="onUnansweredCall" message="impl:onUnansweredCall"/>
+			<wsdl:output name="onUnansweredCallResponse" message="impl:onUnansweredCallResponse"/>
+		</wsdl:operation>
+		
+		<wsdl:operation name="onNomadState" parameterOrder="sessionId mode homeNumber">
+			<documentation>This notification is sent each time the nomadic state has changed.</documentation>
+			<wsdl:input name="onNomadState" message="impl:onNomadState"/>
+			<wsdl:output name="onNomadStateResponse" message="impl:onNomadStateResponse"/>
+		</wsdl:operation>
+		
+	</wsdl:portType>
+
+
+
+
+
+
+
+	<wsdl:binding name="XmlPhoneEventsSoapBinding" type="impl:XmlPhoneEvents">
+		<wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+		<wsdl:operation name="onCallState">
+			<wsdlsoap:operation soapAction="onCallState"/>
+			<wsdl:input name="onCallState">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onCallStateResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onNewSession">
+			<wsdlsoap:operation soapAction="onNewSession"/>
+			<wsdl:input name="onNewSession">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onNewSessionResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onSessionClosed">
+			<wsdlsoap:operation soapAction="onSessionClosed"/>
+			<wsdl:input name="onSessionClosed">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onSessionClosedResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onConnectionDown">
+			<wsdlsoap:operation soapAction="onConnectionDown"/>
+			<wsdl:input name="onConnectionDown">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onConnectionDownResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onPhoneSetStaticState">
+			<wsdlsoap:operation soapAction="onPhoneSetStaticState"/>
+			<wsdl:input name="onPhoneSetStaticState">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onPhoneSetStaticStateResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onUnansweredCall">
+			<wsdlsoap:operation soapAction="onUnansweredCall"/>
+			<wsdl:input name="onUnansweredCall">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onUnansweredCallResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="onNomadState">
+			<wsdlsoap:operation soapAction="onNomadState"/>
+			<wsdl:input name="onNomadState">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:input>
+			<wsdl:output name="onNomadStateResponse">
+				<wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xmlapi.alcatel.com/phone"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:service name="XmlPhoneEventsService">
+		<wsdl:port name="XmlPhoneEvents" binding="impl:XmlPhoneEventsSoapBinding">
+			<wsdlsoap:address location="http://localhost:8080/XMLPhoneEvents"/>
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>
