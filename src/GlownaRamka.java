@@ -205,7 +205,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			String localHost = null;
 			try 
 			{
-				localHost = "194.29.169.93";//InetAddress.getLocalHost().getHostAddress();
+				localHost = "194.29.169.97";//InetAddress.getLocalHost().getHostAddress();
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 
