@@ -10,10 +10,10 @@ package com.alcatel.ServerHTTP.pool;
 //import com.alcatel.woti.business.AlcWatchdogThread;
 //import com.alcatel.woti.business.AlcWatchDog;
 
-import org.apache.log4j.Logger;
-
 import java.util.NoSuchElementException;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
 
 public class AlcThreadPool { //implements AlcWatchDog {
 	

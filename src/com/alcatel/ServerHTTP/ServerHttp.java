@@ -7,13 +7,8 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.lang.Thread;
-import java.lang.Exception;
-import java.lang.System;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 
 import org.apache.log4j.Logger;
 

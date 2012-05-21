@@ -7,10 +7,9 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Enumeration;
-import java.lang.IllegalArgumentException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 

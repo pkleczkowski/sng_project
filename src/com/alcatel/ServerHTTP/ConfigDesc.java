@@ -7,12 +7,9 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.util.Properties;
-import java.lang.String;
-import java.lang.System;
-import java.lang.Exception;
 import java.io.FileInputStream;
-import java.lang.NullPointerException;
+import java.util.Properties;
+
 import org.apache.log4j.Logger;
 /**
  * @author 
