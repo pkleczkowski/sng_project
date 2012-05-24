@@ -62,10 +62,6 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JMenuItem mntmLogout;
 	private JSeparator separator;
 	private JMenuItem mntmExit;
-	/**
-	 * @wbp.nonvisual location=-30,129
-	 */
-	private final JPanel panel = new JPanel();
 	private JLabel lblStatus;
 	private JSeparator separator_1;
 	private JLabel label;
@@ -74,13 +70,18 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JSeparator separator_2;
 	private JLabel label_2;
 	private JLabel label_3;
-	private JLabel lblWaitingForCall;
+	private JLabel labelStatus;
 	private JLabel label_4;
 	private JLabel lblDyrektorDrzymaa;
 	private JLabel label_5;
 	private JLabel lblDepartamentHr;
 	private JLabel label_6;
 	private JLabel label_7;
+	private JTextField textField;
+	private JButton btnCall;
+	private JLabel lblLoggedIn;
+	private JMenuItem menuProgramNrTelefonu;
+	private JMenu menuOptions;
 	
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public GlownaRamka() 
@@ -113,6 +114,12 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		menuProgramWyloguj = new JMenuItem("Logout");
 		menuProgram.add(menuProgramWyloguj);
 		
+		menuOptions = new JMenu("Options");
+		pasekMenu.add(menuOptions);
+				
+		menuProgramNrTelefonu = new JMenuItem("Phone nr");
+		menuOptions.add(menuProgramNrTelefonu);
+		
 		separator = new JSeparator();
 		menuProgram.add(separator);
 		
@@ -138,11 +145,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		//gbl.setConstraints(przyciskKonferencja, gbc);
 		//powZawartosci.add(przyciskKonferencja);
 		
-		// Creation of the instance of ServerHttp
-		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
 		
-		// creation of event ressource
-		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0};
@@ -160,9 +163,9 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		getContentPane().add(panel_2, gbc_panel_2);
 		GridBagLayout gbl_panel_2 = new GridBagLayout();
 		gbl_panel_2.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_2.setLayout(gbl_panel_2);
 		
 		JLabel emptylabel1 = new JLabel("                      ");
@@ -207,19 +210,38 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		gbc_label.gridy = 3;
 		panel_2.add(label, gbc_label);
 		
-		lblWaitingForCall = new JLabel("Waiting for call...");
+		labelStatus = new JLabel("Waiting for call...");
 		GridBagConstraints gbc_lblWaitingForCall = new GridBagConstraints();
-		gbc_lblWaitingForCall.insets = new Insets(0, 0, 0, 5);
-		gbc_lblWaitingForCall.gridx = 2;
+		gbc_lblWaitingForCall.anchor = GridBagConstraints.WEST;
+		gbc_lblWaitingForCall.gridwidth = 6;
+		gbc_lblWaitingForCall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblWaitingForCall.gridx = 1;
 		gbc_lblWaitingForCall.gridy = 4;
-		panel_2.add(lblWaitingForCall, gbc_lblWaitingForCall);
+		panel_2.add(labelStatus, gbc_lblWaitingForCall);
 		
 		label_6 = new JLabel("    ");
 		GridBagConstraints gbc_label_6 = new GridBagConstraints();
-		gbc_label_6.insets = new Insets(0, 0, 0, 5);
+		gbc_label_6.insets = new Insets(0, 0, 5, 5);
 		gbc_label_6.gridx = 10;
 		gbc_label_6.gridy = 4;
 		panel_2.add(label_6, gbc_label_6);
+		
+		textField = new JTextField();
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.gridwidth = 7;
+		gbc_textField.insets = new Insets(8, 0, 5, 120);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 1;
+		gbc_textField.gridy = 5;
+		panel_2.add(textField, gbc_textField);
+		textField.setColumns(10);
+		
+		btnCall = new JButton("Call");
+		GridBagConstraints gbc_btnCall = new GridBagConstraints();
+		gbc_btnCall.insets = new Insets(0, 0, 0, 5);
+		gbc_btnCall.gridx = 1;
+		gbc_btnCall.gridy = 6;
+		panel_2.add(btnCall, gbc_btnCall);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setPreferredSize(new Dimension(300,600));
@@ -307,8 +329,26 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		gbc_lblDepartamentHr.gridy = 5;
 		panel_1.add(lblDepartamentHr, gbc_lblDepartamentHr);
 		
+		JPanel panel_3 = new JPanel();
+		panel_3.setPreferredSize(new Dimension(50,50));
+		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
+		gbc_panel_3.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_3.fill = GridBagConstraints.BOTH;
+		gbc_panel_3.gridx = 0;
+		gbc_panel_3.gridy = 1;
+		gbc_panel_3.gridwidth = 2;
+		getContentPane().add(panel_3, gbc_panel_3);
 		
+		lblLoggedIn = new JLabel("Logged In");
+		panel_3.add(lblLoggedIn);
 		//System.out.println("\nDB koniec G³ówna Ramka");
+		
+		// Creation of the instance of ServerHttp
+		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
+		
+		// creation of event ressource
+		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
+		
 	}
     
     //przypisanie przyciskom konkretnych akcji
@@ -318,7 +358,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		if (zdarzenie.getActionCommand().equals("Login"))
 		{
 			logowanie_wylogowywanie.zaloguj();
-		System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
+			System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
+			aktywujPobStPol();
 		}
 		else if (zdarzenie.getActionCommand().equals("Logout")) 
 			logowanie_wylogowywanie.wyloguj();
@@ -365,7 +406,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			String localHost = null;
 			try 
 			{
-				localHost = "194.29.169.twoja koncowka ip";//InetAddress.getLocalHost().getHostAddress();
+				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 
@@ -461,7 +502,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 				if (calls[i].getState().toString().equals("ringingIncoming"))
 				{
 					//przyciskKonferencja.setEnabled(true);
-					System.out.println("RingingIncoming");
+					this.labelStatus.setText("Ringing incoming from: "+calls[i].getNumber());
 				}				
 				
 				////////////////////////////	
