@@ -213,7 +213,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		labelStatus = new JLabel("Waiting for call...");
 		GridBagConstraints gbc_lblWaitingForCall = new GridBagConstraints();
 		gbc_lblWaitingForCall.anchor = GridBagConstraints.WEST;
-		gbc_lblWaitingForCall.gridwidth = 6;
+		gbc_lblWaitingForCall.gridwidth = 8;
 		gbc_lblWaitingForCall.insets = new Insets(0, 0, 5, 5);
 		gbc_lblWaitingForCall.gridx = 1;
 		gbc_lblWaitingForCall.gridy = 4;
@@ -341,7 +341,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		
 		lblLoggedIn = new JLabel("Logged In");
 		panel_3.add(lblLoggedIn);
-		//System.out.println("\nDB koniec G³ówna Ramka");
+		//System.out.println("\nDB koniec Gï¿½ï¿½wna Ramka");
 		
 		// Creation of the instance of ServerHttp
 		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
@@ -406,7 +406,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			String localHost = null;
 			try 
 			{
-				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
+//				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
+				localHost="194.29.169.97";
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 
@@ -450,6 +451,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		System.out.println("onCallStateEvent\n------------------------------------------------------------");
 		if (calls == null) 
 		{
+			this.labelStatus.setText("Waiting for call...");
+			
 			System.out.println("\tNo calls");
 			sprPol = false;
 			
@@ -503,7 +506,17 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 				{
 					//przyciskKonferencja.setEnabled(true);
 					this.labelStatus.setText("Ringing incoming from: "+calls[i].getNumber());
-				}				
+				}
+				if (calls[i].getState().toString().equals("active"))
+				{
+					//przyciskKonferencja.setEnabled(true);
+					this.labelStatus.setText("Connection established with number: "+calls[i].getNumber());
+				}
+				if (calls[i].getState().toString().equals("releasing"))
+				{
+					//przyciskKonferencja.setEnabled(true);
+					this.labelStatus.setText("Number: "+calls[i].getNumber() + " is releasing");
+				}
 				
 				////////////////////////////	
 				
