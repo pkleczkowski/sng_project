@@ -7,11 +7,6 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.lang.Exception;
-import java.lang.System;
-
-import java.util.*;
-import java.net.*;
 
 public interface AlcGenericRessource
 {

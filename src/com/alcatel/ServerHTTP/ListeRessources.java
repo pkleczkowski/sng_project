@@ -7,10 +7,8 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.lang.Exception;
-import java.lang.System;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 

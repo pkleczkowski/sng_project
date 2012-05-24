@@ -7,17 +7,13 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.lang.Thread;
-import java.lang.Exception;
-import java.lang.System;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import com.alcatel.ServerHTTP.pool.AlcThreadPool;
-
 import org.apache.log4j.Logger;
+
+import com.alcatel.ServerHTTP.pool.AlcThreadPool;
 
 /**
  * This class is a Listen HTTP connection

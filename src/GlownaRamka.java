@@ -1,21 +1,43 @@
 
-import java.awt.event.*;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import javax.swing.*;
-
-import java.net.InetAddress;
+import java.awt.event.WindowListener;
 import java.rmi.RemoteException;
 
-import com.alcatel.xmlapi.phone.*;
-import com.alcatel.xmlapi.phonesetprogramming.types.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
 
-import com.alcatel.ServerHTTP.ServerHttp;
 import com.alcatel.ServerHTTP.AlcEventsRessource;
+import com.alcatel.ServerHTTP.ServerHttp;
+import com.alcatel.xmlapi.phone.AlcLogonResult;
+import com.alcatel.xmlapi.phone.Call;
+import com.alcatel.xmlapi.phone.NomadMode;
+import com.alcatel.xmlapi.phone.XmlPhone;
+import com.alcatel.xmlapi.phone.XmlPhoneEvents;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardTargetType;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardType;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcOverflowType;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcStaticState;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Font;
 
 //stworzenie glownej ramki oraz zdefiniowanie operacji zwiazanej z konkretnym Web Serwisem 
 public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListener, ActionListener  
@@ -23,14 +45,13 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JMenuBar pasekMenu;
 	private JMenu menuProgram;
 	private JMenuItem menuProgramZaloguj, menuProgramWyloguj, menuProgramZakoncz;
-	private JButton przyciskStanPol, przyciskKonferencja;
+	private JButton przyciskKonferencja;
 	private JCheckBox dodatkowaOpcja;
 	private JTextField poleNrTel;
 	
 	private boolean sprPol = false;
 	
 	private GridBagConstraints gbc;
-	private GridBagLayout gbl;
 	
 	private Log logowanie_wylogowywanie;
 	private AlcLogonResult alr = null;
@@ -41,6 +62,26 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JMenuItem mntmLogout;
 	private JSeparator separator;
 	private JMenuItem mntmExit;
+	private JLabel lblStatus;
+	private JSeparator separator_1;
+	private JLabel label;
+	private JLabel label_1;
+	private JLabel lblNumeryWewntrzne;
+	private JSeparator separator_2;
+	private JLabel label_2;
+	private JLabel label_3;
+	private JLabel labelStatus;
+	private JLabel label_4;
+	private JLabel lblDyrektorDrzymaa;
+	private JLabel label_5;
+	private JLabel lblDepartamentHr;
+	private JLabel label_6;
+	private JLabel label_7;
+	private JTextField textField;
+	private JButton btnCall;
+	private JLabel lblLoggedIn;
+	private JMenuItem menuProgramNrTelefonu;
+	private JMenu menuOptions;
 	
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public GlownaRamka() 
@@ -59,12 +100,6 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
     	//GUI
     	gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 5, 5, 5);
-		gbl = new GridBagLayout();
-		
-		Container powZawartosci = getContentPane();
-		powZawartosci.setLayout(gbl);
-		powZawartosci.setPreferredSize(new Dimension(600, 400));
-		powZawartosci.setVisible(true);
 		
 		//Menu
 		pasekMenu = new JMenuBar();
@@ -79,6 +114,12 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		menuProgramWyloguj = new JMenuItem("Logout");
 		menuProgram.add(menuProgramWyloguj);
 		
+		menuOptions = new JMenu("Options");
+		pasekMenu.add(menuOptions);
+				
+		menuProgramNrTelefonu = new JMenuItem("Phone nr");
+		menuOptions.add(menuProgramNrTelefonu);
+		
 		separator = new JSeparator();
 		menuProgram.add(separator);
 		
@@ -88,47 +129,10 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		menuProgramZaloguj.addActionListener(this);
 		menuProgramWyloguj.addActionListener(this);
 		menuProgramZakoncz.addActionListener(this);
-		
-		//gbc.gridx = 0;
-		//gbc.gridy = 0;
-		//gbl.setConstraints(pasekMenu, gbc);
-		//powZawartosci.add(pasekMenu);
-		
-		//opcja automatycznego polaczenia na podany numer po podniesieniu sluchawki
-		//dodatkowaOpcja = new JCheckBox("Autom. pol.");
-		//dodatkowaOpcja.addActionListener(this);
-		//JLabel etykieta = new JLabel("Nr tel.: ");
-		//poleNrTel = new JTextField(5);
-		//poleNrTel.setMaximumSize(poleNrTel.getPreferredSize());
-		//poleNrTel.setEditable(false);
-		//gbc.gridx = 0;
-		//gbc.gridy = 1;
-		//gbc.gridwidth = 1;
-		//gbl.setConstraints(dodatkowaOpcja, gbc);
-		//powZawartosci.add(dodatkowaOpcja);
-		//gbc.gridx = 1;
-		//gbc.gridy = 1;
-		//gbc.gridwidth = 1;
-		//gbc.anchor = GridBagConstraints.EAST;
-		//gbl.setConstraints(etykieta, gbc);
-		//powZawartosci.add(etykieta);
-		//gbc.gridx = 2;
-		//gbc.gridy = 1;
-		//gbc.gridwidth = 1;
-		//gbc.anchor = GridBagConstraints.WEST;
-		///gbl.setConstraints(poleNrTel, gbc);
-		//powZawartosci.add(poleNrTel);
-		
-		//Przycisk "Pobieranie stanu polaczen"
-		przyciskStanPol = new JButton("Pobieranie stanu polaczen");
-		przyciskStanPol.setBorder(BorderFactory.createEtchedBorder());
-		przyciskStanPol.addActionListener(this);
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
-		gbl.setConstraints(przyciskStanPol, gbc);
-		powZawartosci.add(przyciskStanPol);
 	
 		//Przycisk "Konferencja"
 		//przyciskKonferencja = new JButton("Konferencja");
@@ -141,14 +145,210 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		//gbl.setConstraints(przyciskKonferencja, gbc);
 		//powZawartosci.add(przyciskKonferencja);
 		
+		
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWidths = new int[]{0, 0, 0};
+		gridBagLayout.rowHeights = new int[]{0, 0};
+		gridBagLayout.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+		getContentPane().setLayout(gridBagLayout);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setPreferredSize(new Dimension(600,600));
+		GridBagConstraints gbc_panel_2 = new GridBagConstraints();
+		gbc_panel_2.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_2.fill = GridBagConstraints.BOTH;
+		gbc_panel_2.gridx = 0;
+		gbc_panel_2.gridy = 0;
+		getContentPane().add(panel_2, gbc_panel_2);
+		GridBagLayout gbl_panel_2 = new GridBagLayout();
+		gbl_panel_2.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_2.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_2.setLayout(gbl_panel_2);
+		
+		JLabel emptylabel1 = new JLabel("                      ");
+		GridBagConstraints gbc_lblEmptylabel = new GridBagConstraints();
+		gbc_lblEmptylabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblEmptylabel.gridx = 0;
+		gbc_lblEmptylabel.gridy = 0;
+		panel_2.add(emptylabel1, gbc_lblEmptylabel);
+		
+		lblStatus = new JLabel("Status");
+		lblStatus.setFont(new Font("Tahoma", Font.BOLD, 16));
+		GridBagConstraints gbc_lblStatus = new GridBagConstraints();
+		gbc_lblStatus.gridwidth = 7;
+		gbc_lblStatus.insets = new Insets(0, 0, 5, 5);
+		gbc_lblStatus.gridx = 1;
+		gbc_lblStatus.gridy = 1;
+		panel_2.add(lblStatus, gbc_lblStatus);
+		
+		separator_1 = new JSeparator();
+		separator_1.setBackground(Color.BLACK);
+		separator_1.setForeground(Color.BLACK);
+		GridBagConstraints gbc_separator_1 = new GridBagConstraints();
+		gbc_separator_1.fill = GridBagConstraints.BOTH;
+		gbc_separator_1.gridwidth = 8;
+		gbc_separator_1.insets = new Insets(0, 0, 5, 5);
+		gbc_separator_1.gridx = 1;
+		gbc_separator_1.gridy = 2;
+		panel_2.add(separator_1, gbc_separator_1);
+		
+		label_7 = new JLabel("                                                                     ");
+		GridBagConstraints gbc_label_7 = new GridBagConstraints();
+		gbc_label_7.gridwidth = 4;
+		gbc_label_7.insets = new Insets(0, 0, 5, 5);
+		gbc_label_7.gridx = 5;
+		gbc_label_7.gridy = 3;
+		panel_2.add(label_7, gbc_label_7);
+		
+		label = new JLabel("            ");
+		GridBagConstraints gbc_label = new GridBagConstraints();
+		gbc_label.insets = new Insets(0, 0, 5, 0);
+		gbc_label.gridx = 11;
+		gbc_label.gridy = 3;
+		panel_2.add(label, gbc_label);
+		
+		labelStatus = new JLabel("Waiting for call...");
+		GridBagConstraints gbc_lblWaitingForCall = new GridBagConstraints();
+		gbc_lblWaitingForCall.anchor = GridBagConstraints.WEST;
+		gbc_lblWaitingForCall.gridwidth = 6;
+		gbc_lblWaitingForCall.insets = new Insets(0, 0, 5, 5);
+		gbc_lblWaitingForCall.gridx = 1;
+		gbc_lblWaitingForCall.gridy = 4;
+		panel_2.add(labelStatus, gbc_lblWaitingForCall);
+		
+		label_6 = new JLabel("    ");
+		GridBagConstraints gbc_label_6 = new GridBagConstraints();
+		gbc_label_6.insets = new Insets(0, 0, 5, 5);
+		gbc_label_6.gridx = 10;
+		gbc_label_6.gridy = 4;
+		panel_2.add(label_6, gbc_label_6);
+		
+		textField = new JTextField();
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.gridwidth = 7;
+		gbc_textField.insets = new Insets(8, 0, 5, 120);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 1;
+		gbc_textField.gridy = 5;
+		panel_2.add(textField, gbc_textField);
+		textField.setColumns(10);
+		
+		btnCall = new JButton("Call");
+		GridBagConstraints gbc_btnCall = new GridBagConstraints();
+		gbc_btnCall.insets = new Insets(0, 0, 0, 5);
+		gbc_btnCall.gridx = 1;
+		gbc_btnCall.gridy = 6;
+		panel_2.add(btnCall, gbc_btnCall);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setPreferredSize(new Dimension(300,600));
+		GridBagConstraints gbc_panel_1 = new GridBagConstraints();
+		gbc_panel_1.fill = GridBagConstraints.BOTH;
+		gbc_panel_1.gridx = 1;
+		gbc_panel_1.gridy = 0;
+		getContentPane().add(panel_1, gbc_panel_1);
+		GridBagLayout gbl_panel_1 = new GridBagLayout();
+		gbl_panel_1.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
+		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		panel_1.setLayout(gbl_panel_1);
+		
+		label_1 = new JLabel("          ");
+		GridBagConstraints gbc_label_1 = new GridBagConstraints();
+		gbc_label_1.insets = new Insets(0, 0, 5, 5);
+		gbc_label_1.gridx = 0;
+		gbc_label_1.gridy = 0;
+		panel_1.add(label_1, gbc_label_1);
+		
+		lblNumeryWewntrzne = new JLabel("Numery wewn\u0119trzne");
+		lblNumeryWewntrzne.setFont(new Font("Tahoma", Font.BOLD, 16));
+		GridBagConstraints gbc_lblNumeryWewntrzne = new GridBagConstraints();
+		gbc_lblNumeryWewntrzne.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumeryWewntrzne.gridx = 2;
+		gbc_lblNumeryWewntrzne.gridy = 1;
+		panel_1.add(lblNumeryWewntrzne, gbc_lblNumeryWewntrzne);
+		
+		separator_2 = new JSeparator();
+		separator_2.setForeground(Color.BLACK);
+		separator_2.setBackground(Color.BLACK);
+		GridBagConstraints gbc_separator_2 = new GridBagConstraints();
+		gbc_separator_2.gridwidth = 3;
+		gbc_separator_2.insets = new Insets(0, 0, 5, 5);
+		gbc_separator_2.fill = GridBagConstraints.BOTH;
+		gbc_separator_2.gridx = 1;
+		gbc_separator_2.gridy = 2;
+		panel_1.add(separator_2, gbc_separator_2);
+		
+		label_3 = new JLabel("   ");
+		GridBagConstraints gbc_label_3 = new GridBagConstraints();
+		gbc_label_3.insets = new Insets(0, 0, 5, 5);
+		gbc_label_3.gridx = 3;
+		gbc_label_3.gridy = 3;
+		panel_1.add(label_3, gbc_label_3);
+		
+		label_2 = new JLabel("    ");
+		GridBagConstraints gbc_label_2 = new GridBagConstraints();
+		gbc_label_2.insets = new Insets(0, 0, 5, 0);
+		gbc_label_2.gridx = 4;
+		gbc_label_2.gridy = 3;
+		panel_1.add(label_2, gbc_label_2);
+		
+		label_4 = new JLabel("503");
+		GridBagConstraints gbc_label_4 = new GridBagConstraints();
+		gbc_label_4.anchor = GridBagConstraints.WEST;
+		gbc_label_4.insets = new Insets(0, 0, 5, 5);
+		gbc_label_4.gridx = 1;
+		gbc_label_4.gridy = 4;
+		panel_1.add(label_4, gbc_label_4);
+		
+		lblDyrektorDrzymaa = new JLabel("Dyrektor Drzyma\u0142a");
+		GridBagConstraints gbc_lblDyrektorDrzymaa = new GridBagConstraints();
+		gbc_lblDyrektorDrzymaa.anchor = GridBagConstraints.WEST;
+		gbc_lblDyrektorDrzymaa.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDyrektorDrzymaa.gridx = 2;
+		gbc_lblDyrektorDrzymaa.gridy = 4;
+		panel_1.add(lblDyrektorDrzymaa, gbc_lblDyrektorDrzymaa);
+		
+		label_5 = new JLabel("504");
+		GridBagConstraints gbc_label_5 = new GridBagConstraints();
+		gbc_label_5.anchor = GridBagConstraints.WEST;
+		gbc_label_5.insets = new Insets(0, 0, 0, 5);
+		gbc_label_5.gridx = 1;
+		gbc_label_5.gridy = 5;
+		panel_1.add(label_5, gbc_label_5);
+		
+		lblDepartamentHr = new JLabel("Departament HR");
+		GridBagConstraints gbc_lblDepartamentHr = new GridBagConstraints();
+		gbc_lblDepartamentHr.anchor = GridBagConstraints.WEST;
+		gbc_lblDepartamentHr.insets = new Insets(0, 0, 0, 5);
+		gbc_lblDepartamentHr.gridx = 2;
+		gbc_lblDepartamentHr.gridy = 5;
+		panel_1.add(lblDepartamentHr, gbc_lblDepartamentHr);
+		
+		JPanel panel_3 = new JPanel();
+		panel_3.setPreferredSize(new Dimension(50,50));
+		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
+		gbc_panel_3.insets = new Insets(0, 0, 0, 5);
+		gbc_panel_3.fill = GridBagConstraints.BOTH;
+		gbc_panel_3.gridx = 0;
+		gbc_panel_3.gridy = 1;
+		gbc_panel_3.gridwidth = 2;
+		getContentPane().add(panel_3, gbc_panel_3);
+		
+		lblLoggedIn = new JLabel("Logged In");
+		panel_3.add(lblLoggedIn);
+		//System.out.println("\nDB koniec G³ówna Ramka");
+		
 		// Creation of the instance of ServerHttp
 		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
 		
 		// creation of event ressource
 		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
 		
-		
-		//System.out.println("\nDB koniec G³ówna Ramka");
 	}
     
     //przypisanie przyciskom konkretnych akcji
@@ -158,7 +358,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		if (zdarzenie.getActionCommand().equals("Login"))
 		{
 			logowanie_wylogowywanie.zaloguj();
-		System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
+			System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
+			aktywujPobStPol();
 		}
 		else if (zdarzenie.getActionCommand().equals("Logout")) 
 			logowanie_wylogowywanie.wyloguj();
@@ -205,7 +406,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			String localHost = null;
 			try 
 			{
-				localHost = "194.29.169.twoja koncowka ip";//InetAddress.getLocalHost().getHostAddress();
+				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 
@@ -301,7 +502,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 				if (calls[i].getState().toString().equals("ringingIncoming"))
 				{
 					//przyciskKonferencja.setEnabled(true);
-					System.out.println("RingingIncoming");
+					this.labelStatus.setText("Ringing incoming from: "+calls[i].getNumber());
 				}				
 				
 				////////////////////////////	

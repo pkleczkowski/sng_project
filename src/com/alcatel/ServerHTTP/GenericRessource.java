@@ -7,12 +7,6 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.lang.Exception;
-import java.lang.System;
-
-import java.util.*;
-
-import org.apache.log4j.Logger;
 
 /**
  * This class is an interface with the Ressources HTTP objects

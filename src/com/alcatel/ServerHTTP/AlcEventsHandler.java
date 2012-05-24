@@ -7,12 +7,6 @@
 
 package com.alcatel.ServerHTTP;
 
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
 import org.apache.log4j.Logger;
 
 import com.alcatel.xmlapi.phone.Call;

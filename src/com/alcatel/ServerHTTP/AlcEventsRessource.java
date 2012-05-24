@@ -7,19 +7,13 @@
 
 package com.alcatel.ServerHTTP;
 
-import java.io.FileInputStream;
-
-import java.lang.Exception;
-import java.lang.System;
-
-import java.net.Socket;
-import org.xml.sax.InputSource;
-import java.io.StringReader;
-import org.apache.xerces.parsers.SAXParser;
 import java.io.IOException;
-import org.xml.sax.SAXException;
+import java.io.StringReader;
 
 import org.apache.log4j.Logger;
+import org.apache.xerces.parsers.SAXParser;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class AlcEventsRessource implements AlcGenericRessource {
 
