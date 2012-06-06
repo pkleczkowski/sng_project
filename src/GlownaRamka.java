@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -68,14 +69,29 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JLabel lblDyrektorDrzymaa;
 	private JLabel label_5;
 	private JLabel lblDepartamentHr;
+	private JLabel lblDzialReklamacji;
 	private JLabel label_6;
 	private JLabel label_7;
+	private JLabel label_8;
+	private JLabel label_9;
 	private JTextField textField;
 	private JButton btnCall;
 	private JLabel lblLoggedIn;
 	private JMenuItem menuProgramNrTelefonu;
 	private JMenu menuOptions;
 	
+	
+	//nr Ludzikow
+	private static final String SZEF="402";
+	private static final String HR="403";
+	private static final String REKLAMACJA_1="502";
+	private static final String REKLAMACJA_2="503";
+	
+	//tracking uzywania numerów
+	
+	private HashMap usersActivity;
+	
+	private String acctualNumber;
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public GlownaRamka() 
     {
@@ -312,6 +328,30 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		gbc_lblDepartamentHr.gridy = 5;
 		panel_1.add(lblDepartamentHr, gbc_lblDepartamentHr);
 		
+		label_8 = new JLabel("405");
+		GridBagConstraints gbc_label_8 = new GridBagConstraints();
+		gbc_label_8.anchor = GridBagConstraints.WEST;
+		gbc_label_8.insets = new Insets(0, 0, 5, 5);
+		gbc_label_8.gridx = 1;
+		gbc_label_8.gridy = 6;
+		panel_1.add(label_8, gbc_label_8);
+		
+		label_9 = new JLabel("406");
+		GridBagConstraints gbc_label_9 = new GridBagConstraints();
+		gbc_label_9.anchor = GridBagConstraints.WEST;
+		gbc_label_9.insets = new Insets(0, 0, 0, 5);
+		gbc_label_9.gridx = 0;
+		gbc_label_9.gridy = 6;
+		panel_1.add(label_9, gbc_label_9);
+		
+		lblDzialReklamacji = new JLabel("Dzial reklamacji");
+		GridBagConstraints gbc_lblDzialReklamacji = new GridBagConstraints();
+		gbc_lblDzialReklamacji.anchor = GridBagConstraints.WEST;
+		gbc_lblDzialReklamacji.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDzialReklamacji.gridx = 2;
+		gbc_lblDzialReklamacji.gridy = 6;
+		panel_1.add(lblDzialReklamacji, gbc_lblDzialReklamacji);
+		
 		JPanel panel_3 = new JPanel();
 		panel_3.setPreferredSize(new Dimension(50,50));
 		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
@@ -324,10 +364,13 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		
 		lblLoggedIn = new JLabel("Logged In");
 		panel_3.add(lblLoggedIn);
-		//System.out.println("\nDB koniec G��wna Ramka");	
+
+		initializedUserActivitiesHashMap();
 	}
     
-    //przypisanie przyciskom konkretnych akcji
+
+
+	//przypisanie przyciskom konkretnych akcji
     public void actionPerformed(ActionEvent zdarzenie) 
     {
     	System.out.println("\nDB zdarzenie : " + zdarzenie.getActionCommand());
@@ -338,22 +381,29 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			aktywujPobStPol();
 		}
 		else if (zdarzenie.getActionCommand().equals("Call")) {
-			if(textField.getText().matches("\\d\\d\\d")){
-				System.out.println("transfer call nr is =" + textField.getText());
-				this.labelStatus.setText("Trying to transfer call to: "+textField.getText());
-				try {
-					xmlPhone.holdCurrentCall(alr.getSessionId());
-					MakeCallInvoke mci = new MakeCallInvoke();
-					mci.setCallee(textField.getText());
-					mci.setSessionId(alr.getSessionId());
-					xmlPhone.makeCall(mci);
-				} catch (AlcServiceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if(textField.getText().matches("\\d")){
+				acctualNumber = translateNumber(textField.getText());
+				if(acctualNumber.contentEquals("-1")){
+					this.labelStatus.setText("This number is not used, choose diffrent");
+				}else{
+					System.out.println("transfer call nr is =" + acctualNumber);
+					this.labelStatus.setText("Trying to transfer call to: "+acctualNumber);
+					try {
+						xmlPhone.holdCurrentCall(alr.getSessionId());
+						//TODO logika forwardingu
+						MakeCallInvoke mci = new MakeCallInvoke();
+						mci.setCallee(acctualNumber);
+						mci.setSessionId(alr.getSessionId());
+						xmlPhone.makeCall(mci);
+					} catch (AlcServiceException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
 				}
+				
 				
 			}
 			else{
@@ -440,8 +490,44 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		}
 		
 	}
+	
+	private String translateNumber(String number) {
+		
+		if(number.contentEquals("1")){
+		//SZEF
+			return SZEF;
+		}
+		else if(number.contentEquals("2")){
+		//HR
+			return HR;
+		}
+		else if(number.contentEquals("3")){
+		//REKLAMACJA
+			String [] nr = new String[2];
+			nr[0]=REKLAMACJA_1;
+			nr[1]=REKLAMACJA_2;
+			return getRarelyUsedNumber(nr);
+		}else
+			return "-1";
+	}
 
 	
+	private String getRarelyUsedNumber(String[] nrs) {
+		String rareNumber=nrs[0];
+		for(int i=1; i<nrs.length;i++){
+			if(((Integer)usersActivity.get(rareNumber)).compareTo((Integer)usersActivity.get(nrs[i]))>0)
+				rareNumber=nrs[i];
+		}
+		return rareNumber;
+	}
+    private void initializedUserActivitiesHashMap() {
+		usersActivity= new HashMap();
+		usersActivity.put(SZEF, Integer.valueOf(0));
+		usersActivity.put(HR, Integer.valueOf(0));
+		usersActivity.put(REKLAMACJA_1, Integer.valueOf(0));
+		usersActivity.put(REKLAMACJA_2, Integer.valueOf(0));
+	}
+
 	//metody okreslone w interfejsie XmlPhoneEvents
 	public void onCallState(java.lang.String sessionId, Call[] calls) throws java.rmi.RemoteException 
 	{	
@@ -490,6 +576,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 				if (calls[i].getState().toString().equals("ringingOutgoing"))
 				{
 					this.labelStatus.setText("Transfering call to: "+calls[i].getNumber());
+					Integer count =(Integer)usersActivity.get(calls[i].getNumber());
+					usersActivity.put(calls[i].getNumber(), Integer.valueOf(count.intValue()+1));
 					xmlPhone.transferCurrentCall(alr.getSessionId());
 				}
 				if ((calls[i].getCorrelator() != null) && (!calls[i].getCorrelator().equals(""))) {
