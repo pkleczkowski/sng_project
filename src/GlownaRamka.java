@@ -22,15 +22,25 @@ import javax.swing.JTextField;
 
 import com.alcatel.ServerHTTP.AlcEventsRessource;
 import com.alcatel.ServerHTTP.ServerHttp;
+import com.alcatel.xmlapi.common.AlcServiceException;
 import com.alcatel.xmlapi.phone.AlcLogonResult;
 import com.alcatel.xmlapi.phone.Call;
 import com.alcatel.xmlapi.phone.NomadMode;
 import com.alcatel.xmlapi.phone.XmlPhone;
 import com.alcatel.xmlapi.phone.XmlPhoneEvents;
+import com.alcatel.xmlapi.phonesetprogramming.XmlPhoneSetProgramming;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardState;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardTargetType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcOverflowType;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetInfo;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetProgrammingCapabilities;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetProgrammingException;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcServicePrefixes;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcSpeedDialingKey;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcStaticState;
+import com.alcatel.xmlapi.phonesetprogramming.types.AlcUserProgrammableKey;
+
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JPanel;
@@ -40,7 +50,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 //stworzenie glownej ramki oraz zdefiniowanie operacji zwiazanej z konkretnym Web Serwisem 
-public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListener, ActionListener  
+public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetProgramming, WindowListener, ActionListener  
 {
 	private JMenuBar pasekMenu;
 	private JMenu menuProgram;
@@ -213,7 +223,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		labelStatus = new JLabel("Waiting for call...");
 		GridBagConstraints gbc_lblWaitingForCall = new GridBagConstraints();
 		gbc_lblWaitingForCall.anchor = GridBagConstraints.WEST;
-		gbc_lblWaitingForCall.gridwidth = 6;
+		gbc_lblWaitingForCall.gridwidth = 8;
 		gbc_lblWaitingForCall.insets = new Insets(0, 0, 5, 5);
 		gbc_lblWaitingForCall.gridx = 1;
 		gbc_lblWaitingForCall.gridy = 4;
@@ -638,4 +648,120 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	public void windowIconified(WindowEvent zdarzenie){}
 	
 	public void windowOpened(WindowEvent zdarzenie){}
+
+	public void changeSecretCode(String arg0, String arg1)
+			throws RemoteException, AlcServiceException,
+			AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void clickAndDial(String arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public AlcPhoneSetInfo getPhoneSetInfo() throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcPhoneSetProgrammingCapabilities getPhoneSetProgrammingCapabilities()
+			throws RemoteException, AlcServiceException,
+			AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcSpeedDialingKey getSdk(int arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcSpeedDialingKey[] getSdkList() throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcServicePrefixes getServicePrefixes() throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcStaticState getStaticState() throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcUserProgrammableKey getUpk(int arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public AlcUserProgrammableKey[] getUpkList() throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setAssociate(String arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCampOnState(boolean arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCurrentLine(String arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDoNotDisturbState(boolean arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setForwardState(AlcForwardState arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setLockState(boolean arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setOverflowType(AlcOverflowType arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setSdk(AlcSpeedDialingKey arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setUpk(AlcUserProgrammableKey arg0) throws RemoteException,
+			AlcServiceException, AlcPhoneSetProgrammingException {
+		// TODO Auto-generated method stub
+		
+	}
 }
