@@ -1,6 +1,7 @@
 
-import java.awt.Container;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,22 +10,22 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.rmi.RemoteException;
+import java.util.HashMap;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-import com.alcatel.ServerHTTP.AlcEventsRessource;
-import com.alcatel.ServerHTTP.ServerHttp;
 import com.alcatel.xmlapi.common.AlcServiceException;
 import com.alcatel.xmlapi.phone.AlcLogonResult;
 import com.alcatel.xmlapi.phone.Call;
+import com.alcatel.xmlapi.phone.MakeCallInvoke;
 import com.alcatel.xmlapi.phone.NomadMode;
 import com.alcatel.xmlapi.phone.XmlPhone;
 import com.alcatel.xmlapi.phone.XmlPhoneEvents;
@@ -41,37 +42,25 @@ import com.alcatel.xmlapi.phonesetprogramming.types.AlcSpeedDialingKey;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcStaticState;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcUserProgrammableKey;
 
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Color;
-import java.awt.Font;
-
 //stworzenie glownej ramki oraz zdefiniowanie operacji zwiazanej z konkretnym Web Serwisem 
 public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetProgramming, WindowListener, ActionListener  
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JMenuBar pasekMenu;
 	private JMenu menuProgram;
 	private JMenuItem menuProgramZaloguj, menuProgramWyloguj, menuProgramZakoncz;
-	private JButton przyciskKonferencja;
-	private JCheckBox dodatkowaOpcja;
-	private JTextField poleNrTel;
 	
-	private boolean sprPol = false;
 	
 	private GridBagConstraints gbc;
 	
 	private Log logowanie_wylogowywanie;
 	private AlcLogonResult alr = null;
 	private XmlPhone xmlPhone = null;
-	private JMenuBar menuBar;
-	private JMenu mnProgram;
-	private JMenuItem mntmLogin;
-	private JMenuItem mntmLogout;
-	private JSeparator separator;
-	private JMenuItem mntmExit;
+	private XmlPhoneSetProgramming xmlPhoneSetProgramming=null;
+	private JSeparator separator;	
 	private JLabel lblStatus;
 	private JSeparator separator_1;
 	private JLabel label;
@@ -87,12 +76,27 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	private JLabel lblDepartamentHr;
 	private JLabel label_6;
 	private JLabel label_7;
+	private JLabel label_9;
 	private JTextField textField;
 	private JButton btnCall;
 	private JLabel lblLoggedIn;
 	private JMenuItem menuProgramNrTelefonu;
 	private JMenu menuOptions;
 	
+	
+	//nr Ludzikow
+	private static final String SZEF="402";
+	private static final String HR="403";
+	private static final String REKLAMACJA_1="502";
+	private static final String REKLAMACJA_2="503";
+	
+	//tracking uzywania numer√≥w
+	
+	private HashMap usersActivity;
+	
+	private String acctualNumber;
+	private JLabel lblDziaReklamacji;
+	private JLabel label_8;
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public GlownaRamka() 
     {
@@ -104,7 +108,6 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		setVisible(true);
     	
     	//modul logowania i wylogowywania
-    	String[] tabWS = {"XMLPhone"};
     	logowanie_wylogowywanie = new Log();
     	
     	//GUI
@@ -139,21 +142,11 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		menuProgramZaloguj.addActionListener(this);
 		menuProgramWyloguj.addActionListener(this);
 		menuProgramZakoncz.addActionListener(this);
+
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.gridwidth = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
-	
-		//Przycisk "Konferencja"
-		//przyciskKonferencja = new JButton("Konferencja");
-		//przyciskKonferencja.setEnabled(false);
-		//przyciskKonferencja.setBorder(BorderFactory.createEtchedBorder());
-		//przyciskKonferencja.addActionListener(this);
-		//gbc.gridx = 0;
-		//gbc.gridy = 3;
-		//gbc.gridwidth = 3;
-		//gbl.setConstraints(przyciskKonferencja, gbc);
-		//powZawartosci.add(przyciskKonferencja);
 		
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -251,6 +244,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		gbc_btnCall.insets = new Insets(0, 0, 0, 5);
 		gbc_btnCall.gridx = 1;
 		gbc_btnCall.gridy = 6;
+		btnCall.addActionListener(this);
 		panel_2.add(btnCall, gbc_btnCall);
 		
 		JPanel panel_1 = new JPanel();
@@ -262,9 +256,9 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		getContentPane().add(panel_1, gbc_panel_1);
 		GridBagLayout gbl_panel_1 = new GridBagLayout();
 		gbl_panel_1.columnWidths = new int[]{0, 0, 0, 0, 0, 0};
-		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0};
+		gbl_panel_1.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
 		gbl_panel_1.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel_1.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel_1.setLayout(gbl_panel_1);
 		
 		label_1 = new JLabel("          ");
@@ -307,7 +301,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		gbc_label_2.gridy = 3;
 		panel_1.add(label_2, gbc_label_2);
 		
-		label_4 = new JLabel("503");
+		label_4 = new JLabel("1");
 		GridBagConstraints gbc_label_4 = new GridBagConstraints();
 		gbc_label_4.anchor = GridBagConstraints.WEST;
 		gbc_label_4.insets = new Insets(0, 0, 5, 5);
@@ -323,24 +317,40 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		gbc_lblDyrektorDrzymaa.gridy = 4;
 		panel_1.add(lblDyrektorDrzymaa, gbc_lblDyrektorDrzymaa);
 		
-		label_5 = new JLabel("504");
+		label_5 = new JLabel("2");
 		GridBagConstraints gbc_label_5 = new GridBagConstraints();
 		gbc_label_5.anchor = GridBagConstraints.WEST;
-		gbc_label_5.insets = new Insets(0, 0, 0, 5);
+		gbc_label_5.insets = new Insets(0, 0, 5, 5);
 		gbc_label_5.gridx = 1;
 		gbc_label_5.gridy = 5;
 		panel_1.add(label_5, gbc_label_5);
 		
+		label_8 = new JLabel("3");
+		GridBagConstraints gbc_label_8 = new GridBagConstraints();
+		gbc_label_8.anchor = GridBagConstraints.WEST;
+		gbc_label_8.insets = new Insets(0, 0, 5, 5);
+		gbc_label_8.gridx = 1;
+		gbc_label_8.gridy = 6;
+		panel_1.add(label_8, gbc_label_8);
+		
 		lblDepartamentHr = new JLabel("Departament HR");
 		GridBagConstraints gbc_lblDepartamentHr = new GridBagConstraints();
 		gbc_lblDepartamentHr.anchor = GridBagConstraints.WEST;
-		gbc_lblDepartamentHr.insets = new Insets(0, 0, 0, 5);
+		gbc_lblDepartamentHr.insets = new Insets(0, 0, 5, 5);
 		gbc_lblDepartamentHr.gridx = 2;
 		gbc_lblDepartamentHr.gridy = 5;
 		panel_1.add(lblDepartamentHr, gbc_lblDepartamentHr);
 		
+		lblDziaReklamacji = new JLabel("Departament Reklamacji");
+		GridBagConstraints gbc_lblDziaReklamacji = new GridBagConstraints();
+		gbc_lblDziaReklamacji.anchor = GridBagConstraints.WEST;
+		gbc_lblDziaReklamacji.insets = new Insets(0, 0, 5, 5);
+		gbc_lblDziaReklamacji.gridx = 2;
+		gbc_lblDziaReklamacji.gridy = 6;
+		panel_1.add(lblDziaReklamacji, gbc_lblDziaReklamacji);
+		
 		JPanel panel_3 = new JPanel();
-		panel_3.setPreferredSize(new Dimension(50,50));
+		panel_3.setPreferredSize(new Dimension(50, 25));
 		GridBagConstraints gbc_panel_3 = new GridBagConstraints();
 		gbc_panel_3.insets = new Insets(0, 0, 0, 5);
 		gbc_panel_3.fill = GridBagConstraints.BOTH;
@@ -349,27 +359,62 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		gbc_panel_3.gridwidth = 2;
 		getContentPane().add(panel_3, gbc_panel_3);
 		
-		lblLoggedIn = new JLabel("Logged In");
+		
+		lblLoggedIn = new JLabel("Not logged in");
+		lblLoggedIn.setForeground(Color.RED);
+		lblLoggedIn.setFont(new Font("Tahoma",Font.BOLD,14));
+		
 		panel_3.add(lblLoggedIn);
-		//System.out.println("\nDB koniec G≥Ûwna Ramka");
-		
-		// Creation of the instance of ServerHttp
-		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
-		
-		// creation of event ressource
-		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
-		
+
+		initializedUserActivitiesHashMap();
 	}
     
-    //przypisanie przyciskom konkretnych akcji
+
+
+	//przypisanie przyciskom konkretnych akcji
     public void actionPerformed(ActionEvent zdarzenie) 
     {
     	System.out.println("\nDB zdarzenie : " + zdarzenie.getActionCommand());
 		if (zdarzenie.getActionCommand().equals("Login"))
 		{
-			logowanie_wylogowywanie.zaloguj();
+			boolean isLogged = logowanie_wylogowywanie.zaloguj();
+			if (isLogged) {
+				lblLoggedIn.setForeground(Color.GREEN);
+				lblLoggedIn.setText("Logged in");
+			}
 			System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
 			aktywujPobStPol();
+		}
+		else if (zdarzenie.getActionCommand().equals("Call")) {
+			if(textField.getText().matches("\\d")){
+				acctualNumber = translateNumber(textField.getText());
+				if(acctualNumber.contentEquals("-1")){
+					this.labelStatus.setText("This number is not used, choose diffrent");
+				}else{
+					System.out.println("transfer call nr is =" + acctualNumber);
+					this.labelStatus.setText("Trying to transfer call to: "+acctualNumber);
+					try {
+						xmlPhone.holdCurrentCall(alr.getSessionId());
+						//TODO logika forwardingu
+						MakeCallInvoke mci = new MakeCallInvoke();
+						mci.setCallee(acctualNumber);
+						mci.setSessionId(alr.getSessionId());
+						xmlPhone.makeCall(mci);
+					} catch (AlcServiceException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
+				}
+				
+				
+			}
+			else{
+				this.labelStatus.setText("Type correct number");
+			}
+
 		}
 		else if (zdarzenie.getActionCommand().equals("Logout")) 
 			logowanie_wylogowywanie.wyloguj();
@@ -378,24 +423,6 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 			logowanie_wylogowywanie.wyloguj();
 			System.exit(0);
 		}
-		else if (zdarzenie.getActionCommand().equals("Pobieranie stanu polaczen")) 
-		{
-			aktywujPobStPol();
-		}
-		else if (zdarzenie.getActionCommand().equals("Konferencja")) 
-		{
-			rozpocznijKonferencje();
-		}
-		else if (dodatkowaOpcja.isSelected()) 
-		{
-			poleNrTel.setText("403");
-			poleNrTel.setEditable(true);
-		}
-		else if (!dodatkowaOpcja.isSelected()) 
-		{
-			poleNrTel.setText("");
-			poleNrTel.setEditable(false);
-		}
 	}
 	
 	//aktywowanie pobierania stanu polaczen
@@ -403,12 +430,27 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	{
 		
 		xmlPhone = logowanie_wylogowywanie.getXmlPhoneSerwis();
-		alr = logowanie_wylogowywanie.getAlr();
+		xmlPhoneSetProgramming=logowanie_wylogowywanie.getXmlPhoneSetProgramminSerwis();
+		AlcForwardState state2= new AlcForwardState();
+//		state2.setFirstName("llal");
+//		state2.setTargetNumber("400");
+//		state2.setTargetType(AlcForwardTargetType.NUMBER);
+		state2.setType(AlcForwardType.NO_FORWARD);
+		try {
+			xmlPhoneSetProgramming.setForwardState(state2);
+		} catch (AlcServiceException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (AlcPhoneSetProgrammingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RemoteException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
-		//System.out.println("\nactionSubscribeEvents");
-		//if ((!m_bLoggedToSvc) || (m_svcSessionId == null) || (m_svcSessionId.equals(""))) {
-		//	return;
-		//}
+		alr = logowanie_wylogowywanie.getAlrXmlPhone();
+		
 		System.out.println("\nDB Events----------------------------------------");
 		
 		if (xmlPhone != null) 
@@ -416,7 +458,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 			String localHost = null;
 			try 
 			{
-				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
+//				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
+				localHost="194.29.169.97";
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 
@@ -452,16 +495,53 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		}
 		
 	}
+	
+	private String translateNumber(String number) {
+		
+		if(number.contentEquals("1")){
+		//SZEF
+			return SZEF;
+		}
+		else if(number.contentEquals("2")){
+		//HR
+			return HR;
+		}
+		else if(number.contentEquals("3")){
+		//REKLAMACJA
+			String [] nr = new String[2];
+			nr[0]=REKLAMACJA_1;
+			nr[1]=REKLAMACJA_2;
+			return getRarelyUsedNumber(nr);
+		}else
+			return "-1";
+	}
 
 	
+	private String getRarelyUsedNumber(String[] nrs) {
+		String rareNumber=nrs[0];
+		for(int i=1; i<nrs.length;i++){
+			if(((Integer)usersActivity.get(rareNumber)).compareTo((Integer)usersActivity.get(nrs[i]))>0)
+				rareNumber=nrs[i];
+		}
+		return rareNumber;
+	}
+    private void initializedUserActivitiesHashMap() {
+		usersActivity= new HashMap();
+		usersActivity.put(SZEF, Integer.valueOf(0));
+		usersActivity.put(HR, Integer.valueOf(0));
+		usersActivity.put(REKLAMACJA_1, Integer.valueOf(0));
+		usersActivity.put(REKLAMACJA_2, Integer.valueOf(0));
+	}
+
 	//metody okreslone w interfejsie XmlPhoneEvents
 	public void onCallState(java.lang.String sessionId, Call[] calls) throws java.rmi.RemoteException 
 	{	
 		System.out.println("onCallStateEvent\n------------------------------------------------------------");
 		if (calls == null) 
 		{
+			this.labelStatus.setText("Waiting for call...");
+			
 			System.out.println("\tNo calls");
-			sprPol = false;
 			
 			try
 			{
@@ -473,51 +553,38 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 			}
 		}
 		else {
-			if(calls.length == 1)
-				//przyciskKonferencja.setEnabled(false);
 			for (int i = 0; i < calls.length; i++) {
 				System.out.print("\t" + (i+1) + " - ref=" + calls[i].getCallRef() + " / state=" + calls[i].getState().toString() + " (" + calls[i].getName() + " - " + calls[i].getNumber() + ")");
 				
 				/////////////////////////////
 				if (calls[i].getState().toString().equals("dialing")) 
 				{
-					/*if(dodatkowaOpcja.isSelected())
-					{
-						if(!sprPol)
-						{
-							MakeCallInvoke mci = new MakeCallInvoke();
-							mci.setCallee(poleNrTel.getText());
-							mci.setSessionId(alr.getSessionId());
-							try
-							{
-								xmlPhone.makeCall(mci);
-							}
-							catch(Exception w)
-							{
-								w.printStackTrace();
-							}
-							sprPol = true;
-						}
-					}*/
 					System.out.println("Dialing");
 				}
 				
 				if (calls[i].getState().toString().equals("waiting") || calls[i].getState().toString().equals("held"))
 				{
-					//przyciskKonferencja.setEnabled(true);
 					System.out.println("Waiting");
 				}
-				
-				//
 				if (calls[i].getState().toString().equals("ringingIncoming"))
 				{
-					//przyciskKonferencja.setEnabled(true);
 					this.labelStatus.setText("Ringing incoming from: "+calls[i].getNumber());
-				}				
-				
-				////////////////////////////	
-				
-				
+				}
+				if (calls[i].getState().toString().equals("active"))
+				{
+					this.labelStatus.setText("Connection established with number: "+calls[i].getNumber());
+				}
+				if (calls[i].getState().toString().equals("releasing"))
+				{
+					this.labelStatus.setText("Number: "+calls[i].getNumber() + " is releasing");
+				}
+				if (calls[i].getState().toString().equals("ringingOutgoing"))
+				{
+					this.labelStatus.setText("Transfering call to: "+calls[i].getNumber());
+					Integer count =(Integer)usersActivity.get(calls[i].getNumber());
+					usersActivity.put(calls[i].getNumber(), Integer.valueOf(count.intValue()+1));
+					xmlPhone.transferCurrentCall(alr.getSessionId());
+				}
 				if ((calls[i].getCorrelator() != null) && (!calls[i].getCorrelator().equals(""))) {
 					System.out.println(" [Correlator = " + org.apache.axis.types.HexBinary.encode(calls[i].getCorrelator()) + "]");
 					
@@ -543,6 +610,12 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	public void onConnectionDown() throws java.rmi.RemoteException 
 	{
 		System.out.println("onConnectionDown\n------------------------------------------------------------");
+//		AlcForwardState state2= new AlcForwardState();
+//		state2.setFirstName("llal");
+//		state2.setTargetNumber("400");
+//		state2.setTargetType(AlcForwardTargetType.NUMBER);
+//		state2.setType(AlcForwardType.IMMEDIATE);
+//		xmlPhoneSetProgramming.setForwardState(state2);
 	}
 
 	public void onPhoneSetStaticState(String sessionId, AlcStaticState state) throws RemoteException 
@@ -617,18 +690,6 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		System.out.println("------------------------------------------------------------\n");
     }
 	
-	//rozpoczecie konferencji
-	private void rozpocznijKonferencje()
-	{
-		try
-		{
-			xmlPhone.conferenceCurrentCall(alr.getSessionId());
-		}
-		catch(Exception w)
-		{
-			w.printStackTrace();
-		}
-	}
 	
 	//metody okreslone w interfejsie WindowListener
 	 

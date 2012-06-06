@@ -1,0 +1,5 @@
+.gitignore
+bin/*
+.classpath
+.settings/*
+ll
