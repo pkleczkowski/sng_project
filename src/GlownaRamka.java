@@ -24,6 +24,8 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.alcatel.ServerHTTP.AlcEventsRessource;
+import com.alcatel.ServerHTTP.ServerHttp;
 import com.alcatel.xmlapi.common.AlcServiceException;
 import com.alcatel.xmlapi.phone.AlcLogonResult;
 import com.alcatel.xmlapi.phone.Call;
@@ -31,21 +33,13 @@ import com.alcatel.xmlapi.phone.MakeCallInvoke;
 import com.alcatel.xmlapi.phone.NomadMode;
 import com.alcatel.xmlapi.phone.XmlPhone;
 import com.alcatel.xmlapi.phone.XmlPhoneEvents;
-import com.alcatel.xmlapi.phonesetprogramming.XmlPhoneSetProgramming;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardState;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardTargetType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcOverflowType;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetInfo;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetProgrammingCapabilities;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcPhoneSetProgrammingException;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcServicePrefixes;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcSpeedDialingKey;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcStaticState;
-import com.alcatel.xmlapi.phonesetprogramming.types.AlcUserProgrammableKey;
 
 //stworzenie glownej ramki oraz zdefiniowanie operacji zwiazanej z konkretnym Web Serwisem 
-public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetProgramming, WindowListener, ActionListener  
+public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListener, ActionListener  
 {
 	/**
 	 * 
@@ -61,7 +55,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	private Log logowanie_wylogowywanie;
 	private AlcLogonResult alr = null;
 	private XmlPhone xmlPhone = null;
-	private XmlPhoneSetProgramming xmlPhoneSetProgramming=null;
+//	private XmlPhoneSetProgramming xmlPhoneSetProgramming=null;
 	private JSeparator separator;	
 	private JLabel lblStatus;
 	private JSeparator separator_1;
@@ -77,8 +71,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	private JLabel label_5;
 	private JLabel lblDepartamentHr;
 	private JLabel label_6;
-	private JLabel label_7;
-	private JLabel label_9;
+	private JLabel label_7;;
 	private JTextField textField;
 	private JButton btnCall;
 	private JLabel lblLoggedIn;
@@ -387,6 +380,12 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		
 		panel_3.add(lblLoggedIn);
 
+		// Creation of the instance of ServerHttp
+		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
+		
+		// creation of event ressource
+		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
+		
 		initializedUserActivitiesHashMap();
 	}
     
@@ -396,9 +395,10 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
     public void actionPerformed(ActionEvent zdarzenie) 
     {
     	System.out.println("\nDB zdarzenie : " + zdarzenie.getActionCommand());
-		if (zdarzenie.getActionCommand().equals("Login"))
-		{
-			boolean isLogged = logowanie_wylogowywanie.zaloguj();
+		if (zdarzenie.getActionCommand().equals("Login")){
+			logowanie_wylogowywanie.zaloguj();
+//			boolean isLogged = logowanie_wylogowywanie.zaloguj();
+			boolean isLogged = true;
 			if (isLogged) {
 				lblLoggedIn.setForeground(Color.GREEN);
 				lblLoggedIn.setText("Logged in");
@@ -451,27 +451,12 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	{
 		
 		xmlPhone = logowanie_wylogowywanie.getXmlPhoneSerwis();
-		xmlPhoneSetProgramming=logowanie_wylogowywanie.getXmlPhoneSetProgramminSerwis();
-		AlcForwardState state2= new AlcForwardState();
-//		state2.setFirstName("llal");
-//		state2.setTargetNumber("400");
-//		state2.setTargetType(AlcForwardTargetType.NUMBER);
-		state2.setType(AlcForwardType.NO_FORWARD);
-		try {
-			xmlPhoneSetProgramming.setForwardState(state2);
-		} catch (AlcServiceException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (AlcPhoneSetProgrammingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		alr = logowanie_wylogowywanie.getAlr();
 		
-		alr = logowanie_wylogowywanie.getAlrXmlPhone();
-		
+		//System.out.println("\nactionSubscribeEvents");
+		//if ((!m_bLoggedToSvc) || (m_svcSessionId == null) || (m_svcSessionId.equals(""))) {
+		//	return;
+		//}
 		System.out.println("\nDB Events----------------------------------------");
 		
 		if (xmlPhone != null) 
@@ -479,7 +464,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 			String localHost = null;
 			try 
 			{
-//				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
+//				localHost = InetAddress.getLocalHost().getHostAddress();
 				localHost="194.29.169.60";
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
@@ -731,119 +716,4 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	
 	public void windowOpened(WindowEvent zdarzenie){}
 
-	public void changeSecretCode(String arg0, String arg1)
-			throws RemoteException, AlcServiceException,
-			AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void clickAndDial(String arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public AlcPhoneSetInfo getPhoneSetInfo() throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcPhoneSetProgrammingCapabilities getPhoneSetProgrammingCapabilities()
-			throws RemoteException, AlcServiceException,
-			AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcSpeedDialingKey getSdk(int arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcSpeedDialingKey[] getSdkList() throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcServicePrefixes getServicePrefixes() throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcStaticState getStaticState() throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcUserProgrammableKey getUpk(int arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public AlcUserProgrammableKey[] getUpkList() throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setAssociate(String arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setCampOnState(boolean arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setCurrentLine(String arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setDoNotDisturbState(boolean arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setForwardState(AlcForwardState arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setLockState(boolean arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setOverflowType(AlcOverflowType arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setSdk(AlcSpeedDialingKey arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setUpk(AlcUserProgrammableKey arg0) throws RemoteException,
-			AlcServiceException, AlcPhoneSetProgrammingException {
-		// TODO Auto-generated method stub
-		
-	}
 }
