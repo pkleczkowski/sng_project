@@ -21,6 +21,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import com.alcatel.xmlapi.common.AlcServiceException;
 import com.alcatel.xmlapi.phone.AlcLogonResult;
@@ -239,11 +241,30 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 		panel_2.add(textField, gbc_textField);
 		textField.setColumns(10);
 		
+		textField.getDocument().addDocumentListener(
+				new DocumentListener() {
+					public void changedUpdate(DocumentEvent e) {
+						btnCall.setEnabled(true);
+					}
+
+					public void removeUpdate(DocumentEvent e) {
+						if (!textField.getText().isEmpty())
+							btnCall.setEnabled(true);
+						else
+							btnCall.setEnabled(false);
+					}
+
+					public void insertUpdate(DocumentEvent e) {
+						btnCall.setEnabled(true);
+					}
+				});
+		
 		btnCall = new JButton("Call");
 		GridBagConstraints gbc_btnCall = new GridBagConstraints();
 		gbc_btnCall.insets = new Insets(0, 0, 0, 5);
 		gbc_btnCall.gridx = 1;
 		gbc_btnCall.gridy = 6;
+		btnCall.setEnabled(false);
 		btnCall.addActionListener(this);
 		panel_2.add(btnCall, gbc_btnCall);
 		
