@@ -85,10 +85,10 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 	
 	
 	//nr Ludzikow
-	private static final String SZEF="402";
-	private static final String HR="403";
-	private static final String REKLAMACJA_1="502";
-	private static final String REKLAMACJA_2="503";
+	private static final String SZEF="501";
+	private static final String HR="400";
+	private static final String REKLAMACJA_1="402";
+	private static final String REKLAMACJA_2="403";
 	
 	//tracking uzywania numerów
 	
@@ -459,7 +459,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, XmlPhoneSetPr
 			try 
 			{
 //				localHost = "194.29.169.96";//InetAddress.getLocalHost().getHostAddress();
-				localHost="194.29.169.97";
+				localHost="194.29.169.60";
 				System.out.println("DB xxx loc-host:" + localHost);
 			}
 			catch (Exception e) 

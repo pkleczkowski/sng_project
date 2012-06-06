@@ -36,7 +36,7 @@ public class Log {
 		String apiFwHost = "194.29.169.39";
 		String apiFwPort = "8080";
 		apiFwUrl = "http://" + apiFwHost + ":" + apiFwPort;
-    	user = "user402";
+    	user = "user505";
 		pass = "123";
 	}
 	
