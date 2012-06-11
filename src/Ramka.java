@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.rmi.RemoteException;
-import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,11 +27,9 @@ import javax.swing.event.DocumentListener;
 import com.alcatel.ServerHTTP.AlcEventsRessource;
 import com.alcatel.ServerHTTP.ServerHttp;
 import com.alcatel.xmlapi.common.AlcServiceException;
-import com.alcatel.xmlapi.phone.AlcLogonResult;
 import com.alcatel.xmlapi.phone.Call;
 import com.alcatel.xmlapi.phone.MakeCallInvoke;
 import com.alcatel.xmlapi.phone.NomadMode;
-import com.alcatel.xmlapi.phone.XmlPhone;
 import com.alcatel.xmlapi.phone.XmlPhoneEvents;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardTargetType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcForwardType;
@@ -39,7 +37,7 @@ import com.alcatel.xmlapi.phonesetprogramming.types.AlcOverflowType;
 import com.alcatel.xmlapi.phonesetprogramming.types.AlcStaticState;
 
 //stworzenie glownej ramki oraz zdefiniowanie operacji zwiazanej z konkretnym Web Serwisem 
-public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListener, ActionListener  
+public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, ActionListener  
 {
 	/**
 	 * 
@@ -52,9 +50,7 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	
 	private GridBagConstraints gbc;
 	
-	private Log logowanie_wylogowywanie;
-	private AlcLogonResult alr = null;
-	private XmlPhone xmlPhone = null;
+	private Loging log;
 //	private XmlPhoneSetProgramming xmlPhoneSetProgramming=null;
 	private JSeparator separator;	
 	private JLabel lblStatus;
@@ -77,34 +73,25 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	private JLabel lblLoggedIn;
 	private JMenuItem menuProgramNrTelefonu;
 	private JMenu menuOptions;
-	
-	
-	//nr Ludzikow
-	private static final String SZEF="501";
-	private static final String HR="400";
-	private static final String REKLAMACJA_1="402";
-	private static final String REKLAMACJA_2="403";
-	
-	//tracking uzywania numerów
-	
-	private HashMap usersActivity;
-	
-	private String acctualNumber;
 	private JLabel lblDziaReklamacji;
 	private JLabel label_8;
+
+	//--------------OBIEKTTY LOGIKI APLIKACJI ----------------------------------
+			
+	private Vector telephones ;
+	
+	private String acctualNumber;
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
-    public GlownaRamka() 
+    public Ramka() 
     {
+    	//----------------------GRAFIKA--------------------------------------
     	//wlasciwosci ramki
     	addWindowListener(this);
 		setTitle("Stan polaczenia");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(600, 400);
 		setVisible(true);
-    	
-    	//modul logowania i wylogowywania
-    	logowanie_wylogowywanie = new Log();
-    	
+    	    	
     	//GUI
     	gbc = new GridBagConstraints();
 		gbc.insets = new Insets(0, 5, 5, 5);
@@ -380,15 +367,25 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 		
 		panel_3.add(lblLoggedIn);
 
+		//----------------------GRAFIKA--------------------------------------
+		//----------------------LOGIKA APLIKACJI--------------------------------------
 		// Creation of the instance of ServerHttp
-		ServerHttp lServerHttp = ServerHttp.instance(/*m_httpServerPort*/"10101");
+    	
+		ServerHttp lServerHttp = ServerHttp.instance(CallProperties.NOTIF_SERV_PORT);
 		
 		// creation of event ressource
-		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, /*EVENT_CONTEXT*/"/phone/events");
+		AlcEventsRessource lEventsRessource = new AlcEventsRessource(this, CallProperties.EVENT_CONTEXT);
 		
-		initializedUserActivitiesHashMap();
+		// Logowanie sekretarki
+		log= new Loging("user" + CallProperties.SECRETARY_NUM, "123");
+		//logowanie pozostalych numerów
+		initializedTelephones();
 	}
     
+
+
+
+
 
 
 	//przypisanie przyciskom konkretnych akcji
@@ -396,15 +393,16 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
     {
     	System.out.println("\nDB zdarzenie : " + zdarzenie.getActionCommand());
 		if (zdarzenie.getActionCommand().equals("Login")){
-			logowanie_wylogowywanie.zaloguj();
-//			boolean isLogged = logowanie_wylogowywanie.zaloguj();
+			log.logIn(CallProperties.getNotifUrl());
+			logInTelephones();			
+			//TODO dorobic logike logowania
 			boolean isLogged = true;
 			if (isLogged) {
 				lblLoggedIn.setForeground(Color.GREEN);
 				lblLoggedIn.setText("Logged in");
 			}
 			System.out.println("\nDB po zdarzeniu : " + zdarzenie.getActionCommand());
-			aktywujPobStPol();
+			System.out.println("session id of sekretarrka is" +log.getAlr().getSessionId());
 		}
 		else if (zdarzenie.getActionCommand().equals("Call")) {
 			if(textField.getText().matches("\\d")){
@@ -415,12 +413,14 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 					System.out.println("transfer call nr is =" + acctualNumber);
 					this.labelStatus.setText("Trying to transfer call to: "+acctualNumber);
 					try {
-						xmlPhone.holdCurrentCall(alr.getSessionId());
+						System.out.println("session id of sekretarrka is" +log.getAlr().getSessionId());
+						log.getXmlPhoneSerwis().holdCurrentCall(log.getAlr().getSessionId());
+						log.getXmlPhoneSerwis().holdCurrentCall(log.getAlr().getSessionId());
 						//TODO logika forwardingu
 						MakeCallInvoke mci = new MakeCallInvoke();
 						mci.setCallee(acctualNumber);
-						mci.setSessionId(alr.getSessionId());
-						xmlPhone.makeCall(mci);
+						mci.setSessionId(log.getAlr().getSessionId());
+						log.getXmlPhoneSerwis().makeCall(mci);
 					} catch (AlcServiceException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -437,169 +437,152 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 			}
 
 		}
-		else if (zdarzenie.getActionCommand().equals("Logout")) 
-			logowanie_wylogowywanie.wyloguj();
+		else if (zdarzenie.getActionCommand().equals("Logout")) {
+			log.logOut();
+			logOutTelephones();
+		}
+			
 		else if (zdarzenie.getActionCommand().equals("Exit")) 
 		{
-			logowanie_wylogowywanie.wyloguj();
+			log.logOut();
+			logOutTelephones();
 			System.exit(0);
 		}
-	}
-	
-	//aktywowanie pobierania stanu polaczen
-	private void aktywujPobStPol()
-	{
-		
-		xmlPhone = logowanie_wylogowywanie.getXmlPhoneSerwis();
-		alr = logowanie_wylogowywanie.getAlr();
-		
-		//System.out.println("\nactionSubscribeEvents");
-		//if ((!m_bLoggedToSvc) || (m_svcSessionId == null) || (m_svcSessionId.equals(""))) {
-		//	return;
-		//}
-		System.out.println("\nDB Events----------------------------------------");
-		
-		if (xmlPhone != null) 
-		{
-			String localHost = null;
-			try 
-			{
-//				localHost = InetAddress.getLocalHost().getHostAddress();
-				localHost="194.29.169.60";
-				System.out.println("DB xxx loc-host:" + localHost);
-			}
-			catch (Exception e) 
-			{
-				System.out.println("java.net.InetAddress.getLocalHost failed : " + e.getMessage());
-			}
-			
-			try 
-			{
-				String lNotificationUrl = "http://" + localHost + ":" + /*m_httpServerPort*/"10101" + /*EVENT_CONTEXT*/"/phone/events";
-				System.out.println("DB notification ULR=" + lNotificationUrl);
-				//if (!m_subscribe) {
-					xmlPhone.subscribe(alr.getSessionId(), lNotificationUrl);
-					//m_subscribe = true;
-				//}2
-				//else {
-				//	xmlPhoneService.unsubscribe(m_svcSessionId);
-				//	m_subscribe = false;
-				//}
-			}
-			catch (RemoteException e) {
-				System.out.println("subscribe RemoteException : " + e);
-			}	
-			
-			/*if (!m_subscribe) {
-				m_jBtSubscribeEvents.setToolTipText("subsribe to events");
-				m_jBtSubscribeEvents.setIcon(new javax.swing.ImageIcon("res\\subscribe.gif"));
-			}
-			else {
-				m_jBtSubscribeEvents.setToolTipText("unsubsribe to events");
-				m_jBtSubscribeEvents.setIcon(new javax.swing.ImageIcon("res\\unsubscribe.gif"));
-			}*/
-		}
-		
 	}
 	
 	private String translateNumber(String number) {
 		
 		if(number.contentEquals("1")){
 		//SZEF
-			return SZEF;
+			return CallProperties.SZEF_NUM;
 		}
 		else if(number.contentEquals("2")){
 		//HR
-			return HR;
+			return CallProperties.HR_NUM;
 		}
 		else if(number.contentEquals("3")){
 		//REKLAMACJA
-			String [] nr = new String[2];
-			nr[0]=REKLAMACJA_1;
-			nr[1]=REKLAMACJA_2;
-			return getRarelyUsedNumber(nr);
+			Telephone [] nr = new Telephone[2];
+			nr[0]=findTelephone(CallProperties.REKLAMACJA_1_NUM);
+			nr[1]=findTelephone(CallProperties.REKLAMACJA_2_NUM);
+			return getRarelyUsedNumber(nr).getNumber();
 		}else
 			return "-1";
 	}
 
 	
-	private String getRarelyUsedNumber(String[] nrs) {
-		String rareNumber=nrs[0];
+	private Telephone getRarelyUsedNumber(Telephone[] nrs) {
+		Telephone rareNumber=nrs[0];
 		for(int i=1; i<nrs.length;i++){
-			if(((Integer)usersActivity.get(rareNumber)).compareTo((Integer)usersActivity.get(nrs[i]))>0)
+			if(rareNumber.getActivity()>nrs[i].getActivity())
 				rareNumber=nrs[i];
 		}
 		return rareNumber;
 	}
-    private void initializedUserActivitiesHashMap() {
-		usersActivity= new HashMap();
-		usersActivity.put(SZEF, Integer.valueOf(0));
-		usersActivity.put(HR, Integer.valueOf(0));
-		usersActivity.put(REKLAMACJA_1, Integer.valueOf(0));
-		usersActivity.put(REKLAMACJA_2, Integer.valueOf(0));
+	private void initializedTelephones() {
+		telephones= new Vector();
+//		telephones.add(new Telephone(CallProperties.SZEF_NUM));
+//		telephones.add(new Telephone(CallProperties.HR_NUM));
+		telephones.add(new Telephone(CallProperties.REKLAMACJA_1_NUM));
+		telephones.add(new Telephone(CallProperties.REKLAMACJA_2_NUM));
+		
 	}
+	
+	private void logInTelephones(){
+		for(int i=0;i<telephones.size();i++){
+			((Telephone) telephones.get(i)).logIn();
+		}
+	}
+	private void logOutTelephones(){
+		for(int i=0;i<telephones.size();i++){
+			((Telephone) telephones.get(i)).logOut();
+		}
+	}
+	private Telephone findTelephone(String number){
+		Telephone tele = null;
+		for(int i=0;i<telephones.size();i++){
+			if(((Telephone) telephones.get(i)).getNumber().equals(number))
+				tele=(Telephone) telephones.get(i);
+		}
+		return tele;
+	}
+	
+	
 
 	//metody okreslone w interfejsie XmlPhoneEvents
 	public void onCallState(java.lang.String sessionId, Call[] calls) throws java.rmi.RemoteException 
 	{	
 		System.out.println("onCallStateEvent\n------------------------------------------------------------");
-		if (calls == null) 
-		{
-			this.labelStatus.setText("Waiting for call...");
-			
-			System.out.println("\tNo calls");
-			
-			try
+		
+		if (sessionId.equals(log.getAlr().getSessionId())) {
+			System.out.println("Połączenie do pani sekretarki");
+			if (calls == null) 
 			{
-				xmlPhone.clearCurrentCall(alr.getSessionId());
-			}
-			catch(Exception w)
-			{
-				w.printStackTrace();
-			}
-		}
-		else {
-			for (int i = 0; i < calls.length; i++) {
-				System.out.print("\t" + (i+1) + " - ref=" + calls[i].getCallRef() + " / state=" + calls[i].getState().toString() + " (" + calls[i].getName() + " - " + calls[i].getNumber() + ")");
+				this.labelStatus.setText("Waiting for call...");
 				
-				/////////////////////////////
-				if (calls[i].getState().toString().equals("dialing")) 
-				{
-					System.out.println("Dialing");
-				}
+				System.out.println("\tNo calls");
 				
-				if (calls[i].getState().toString().equals("waiting") || calls[i].getState().toString().equals("held"))
+				try
 				{
-					System.out.println("Waiting");
+					log.getXmlPhoneSerwis().clearCurrentCall(log.getAlr().getSessionId());
 				}
-				if (calls[i].getState().toString().equals("ringingIncoming"))
+				catch(Exception w)
 				{
-					this.labelStatus.setText("Ringing incoming from: "+calls[i].getNumber());
+					System.out.println("Wystapill jakis blad");
+					w.printStackTrace();
 				}
-				if (calls[i].getState().toString().equals("active"))
-				{
-					this.labelStatus.setText("Connection established with number: "+calls[i].getNumber());
-				}
-				if (calls[i].getState().toString().equals("releasing"))
-				{
-					this.labelStatus.setText("Number: "+calls[i].getNumber() + " is releasing");
-				}
-				if (calls[i].getState().toString().equals("ringingOutgoing"))
-				{
-					this.labelStatus.setText("Transfering call to: "+calls[i].getNumber());
-					Integer count =(Integer)usersActivity.get(calls[i].getNumber());
-					usersActivity.put(calls[i].getNumber(), Integer.valueOf(count.intValue()+1));
-					xmlPhone.transferCurrentCall(alr.getSessionId());
-				}
-				if ((calls[i].getCorrelator() != null) && (!calls[i].getCorrelator().equals(""))) {
-					System.out.println(" [Correlator = " + org.apache.axis.types.HexBinary.encode(calls[i].getCorrelator()) + "]");
+			}
+			else {
+				for (int i = 0; i < calls.length; i++) {
+					System.out.print("\t" + (i+1) + " - ref=" + calls[i].getCallRef() + " / state=" + calls[i].getState().toString() + " (" + calls[i].getName() + " - " + calls[i].getNumber() + ")");
 					
-				}
-				else {
-					System.out.println("");
+					/////////////////////////////
+					if (calls[i].getState().toString().equals("dialing")) 
+					{
+						System.out.println("SEKRETARKA - Dialing");
+					}
+					
+					if (calls[i].getState().toString().equals("waiting") || calls[i].getState().toString().equals("held"))
+					{
+						System.out.println("SEKRETARKA - Waiting");
+					}
+					if (calls[i].getState().toString().equals("ringingIncoming"))
+					{
+						this.labelStatus.setText("SEKRETARKA - Ringing incoming from: "+calls[i].getNumber());
+					}
+					if (calls[i].getState().toString().equals("active"))
+					{
+						this.labelStatus.setText("SEKRETARKA -Connection established with number: "+calls[i].getNumber());
+					}
+					if (calls[i].getState().toString().equals("releasing"))
+					{
+						this.labelStatus.setText("SEKRETARKA -Number: "+calls[i].getNumber() + " is releasing");
+					}
+					if (calls[i].getState().toString().equals("ringingOutgoing"))
+					{
+						this.labelStatus.setText("SEKRETARKA - Transfering call to: "+calls[i].getNumber());
+						findTelephone(calls[i].getNumber()).setActivity(findTelephone(calls[i].getNumber()).getActivity()+1);
+						log.getXmlPhoneSerwis().transferCurrentCall(log.getAlr().getSessionId());
+					}
+					if ((calls[i].getCorrelator() != null) && (!calls[i].getCorrelator().equals(""))) {
+						System.out.println(" [Correlator = " + org.apache.axis.types.HexBinary.encode(calls[i].getCorrelator()) + "]");
+					}
+					else {
+						System.out.println("");
+					}
 				}
 			}
+				
+			}
+		else{
+			for (int i = 0; i < calls.length; i++) {
+				//TODO tutaj sie wywala błąd
+				System.out.println("Call state jednego z numerów : "+ calls[i].getNumber());	
+			}
+			
+			
 		}
+
 		System.out.println("------------------------------------------------------------\n");
 	}
 
@@ -705,7 +688,8 @@ public class GlownaRamka extends JFrame implements XmlPhoneEvents, WindowListene
 	
 	public void windowClosing(WindowEvent zdarzenie) 
 	{
-		logowanie_wylogowywanie.wyloguj();
+		log.logOut();
+		logOutTelephones();
 	}
 
 	public void windowDeactivated(WindowEvent zdarzenie){}
