@@ -743,19 +743,23 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 				String number = textField.getText();
 				if(number.contentEquals("1")){
 					//SZEF
+					System.out.println("Naciśnięto 1");
 					acctualTele= findTelephone(CallProperties.SZEF_NUM);
 					if(acctualTele.getState().equals(CallProperties.TELE_BUSY)){
 						this.labelStatus.setText(acctualTele.getName()+" jest zajęty przykro mi");
+						acctualTele=null;
 					}
-					acctualTele=null;
+					
 				}
 				else if(number.contentEquals("2")){
 				//HR
+					System.out.println("Naciśnięto 2");
 					acctualTele= findTelephone(CallProperties.HR_NUM);
 					if(acctualTele.getState().equals(CallProperties.TELE_BUSY)){
 						this.labelStatus.setText(acctualTele.getName()+"  jest zajęty przykro mi");
+						acctualTele=null;
 					}
-					acctualTele=null;
+					
 				}
 				else if(number.contentEquals("3")){
 				//REKLAMACJA
@@ -951,8 +955,10 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 				}
 			}else{
 				for (int i = 0; i < calls.length; i++) {
+					System.out.println("The state of tele"+ tele.getName() + " is "+ calls[i].getState().toString());
 					if (calls[i].getState().toString().equals("dialing")) 
 					{
+						tele.setState(CallProperties.TELE_BUSY);
 						tele.setStatus("dialing");
 					}
 					
