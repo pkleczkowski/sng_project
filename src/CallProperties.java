@@ -16,6 +16,7 @@ public class CallProperties {
 	public static final String REKLAMACJA_2_NUM="400";
 	public static final String REKLAMACJA_2_NAME="Dział reklamacji 2";
 	public static final String LOCALHOST="194.29.169.56";
+	public static final String LOCALHOST2="194.29.169.56";
 	
 	public static final String TELE_BUSY="BUSY";
 	public static final String TELE_FREE="FREE";
