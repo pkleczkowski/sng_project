@@ -26,10 +26,11 @@ public class Loging {
 		this.pass = pass;
 	}
 
-	public void logIn(String notifUrl) {
+	public boolean logIn(String notifUrl) {
 		logIntoApiFramework();
-		logIntoXmlPhone();
+		boolean isLogged = logIntoXmlPhone();
 		subscribe(notifUrl);
+		return isLogged;
 	}
 
 	private void logIntoApiFramework() {
@@ -67,7 +68,7 @@ public class Loging {
 	}
 
 	// logowanie do Web Serwisu XMLPhone
-	private void logIntoXmlPhone() {
+	private boolean logIntoXmlPhone() {
 		if (sessionId != null) {
 			XmlPhoneServiceLocator serwis = new XmlPhoneServiceLocator();
 			try {
@@ -76,12 +77,14 @@ public class Loging {
 								+ "/api/services/2.2/XMLPhone?ApiSessionId="
 								+ sessionId));
 				alr = xmlPhoneSerwis.login();
-				
+				System.out.println("** zalogujDoXmlPhone() -done");
+				return true;
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				return false;
 			}
-			System.out.println("** zalogujDoXmlPhone() -done");
 		}
+		else return false;
 	}
 
 	// aktywowanie pobierania stanu polaczen
@@ -96,14 +99,16 @@ public class Loging {
 		}
 	}
 
-	public void logOut() {
+	public boolean logOut() {
 		try {
 			xmlPhoneSerwis.unsubscribe(alr.getSessionId());
 			xmlPhoneSerwis.logout(alr.getSessionId());
 			xmlApiFramework.logout();
 			System.out.println("* logOut() -done");
+			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			return false;
 		}
 	}
 
