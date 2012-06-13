@@ -80,7 +80,7 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 			
 	private Vector telephones ;
 	
-	private String acctualNumber;
+	private Telephone acctualTele;
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public Ramka() 
     {
@@ -406,26 +406,54 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 		}
 		else if (zdarzenie.getActionCommand().equals("Call")) {
 			if(textField.getText().matches("\\d")){
-				acctualNumber = translateNumber(textField.getText());
-				if(acctualNumber.contentEquals("-1")){
-					this.labelStatus.setText("This number is not used, choose diffrent");
+				
+				String number = textField.getText();
+				if(number.contentEquals("1")){
+					//SZEF
+					acctualTele= findTelephone(CallProperties.SZEF_NUM);
+					if(acctualTele.getState().equals(CallProperties.TELE_BUSY)){
+						this.labelStatus.setText(acctualTele.getName()+" jest zajęty przykro mi");
+					}
+					acctualTele=null;
+				}
+				else if(number.contentEquals("2")){
+				//HR
+					acctualTele= findTelephone(CallProperties.HR_NUM);
+					if(acctualTele.getState().equals(CallProperties.TELE_BUSY)){
+						this.labelStatus.setText(acctualTele.getName()+"  jest zajęty przykro mi");
+					}
+					acctualTele=null;
+				}
+				else if(number.contentEquals("3")){
+				//REKLAMACJA
+					Telephone [] nr = new Telephone[2];
+					nr[0]=findTelephone(CallProperties.REKLAMACJA_1_NUM);
+					nr[1]=findTelephone(CallProperties.REKLAMACJA_2_NUM);
+					acctualTele=  getRarelyUsedNumberAndFree(nr);
+					if(acctualTele==null){
+						this.labelStatus.setText("Wszyscy z dzialu reklamacji są zajęci");
+					}
 				}else{
-					System.out.println("transfer call nr is =" + acctualNumber);
-					this.labelStatus.setText("Trying to transfer call to: "+acctualNumber);
+					acctualTele= null;
+					this.labelStatus.setText("This number is not used, choose diffrent");
+				}
+				
+				
+				if(acctualTele!=null){
+					System.out.println("transfer call nr is =" + acctualTele);
+					this.labelStatus.setText("Trying to transfer call to: "+acctualTele);
 					try {
 						System.out.println("session id of sekretarrka is" +log.getAlr().getSessionId());
 						log.getXmlPhoneSerwis().holdCurrentCall(log.getAlr().getSessionId());
 						log.getXmlPhoneSerwis().holdCurrentCall(log.getAlr().getSessionId());
 						//TODO logika forwardingu
 						MakeCallInvoke mci = new MakeCallInvoke();
-						mci.setCallee(acctualNumber);
+						mci.setCallee(acctualTele.getNumber());
 						mci.setSessionId(log.getAlr().getSessionId());
 						log.getXmlPhoneSerwis().makeCall(mci);
 					} catch (AlcServiceException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}	
 				}
@@ -449,43 +477,44 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 			System.exit(0);
 		}
 	}
-	
-	private String translateNumber(String number) {
 		
-		if(number.contentEquals("1")){
-		//SZEF
-			return CallProperties.SZEF_NUM;
+	private Telephone getRarelyUsedNumberAndFree(Telephone[] nrs) {
+		nrs = getFreeTele(nrs);
+		if(nrs==null){
+			return null;
 		}
-		else if(number.contentEquals("2")){
-		//HR
-			return CallProperties.HR_NUM;
+		else{
+			Telephone rareNumber=nrs[0];
+			for(int i=1; i<nrs.length;i++){
+				if(rareNumber.getActivity()>nrs[i].getActivity())
+					rareNumber=nrs[i];
+			}
+			return rareNumber;
 		}
-		else if(number.contentEquals("3")){
-		//REKLAMACJA
-			Telephone [] nr = new Telephone[2];
-			nr[0]=findTelephone(CallProperties.REKLAMACJA_1_NUM);
-			nr[1]=findTelephone(CallProperties.REKLAMACJA_2_NUM);
-			return getRarelyUsedNumber(nr).getNumber();
-		}else
-			return "-1";
-	}
 
-	
-	private Telephone getRarelyUsedNumber(Telephone[] nrs) {
-		Telephone rareNumber=nrs[0];
-		for(int i=1; i<nrs.length;i++){
-			if(rareNumber.getActivity()>nrs[i].getActivity())
-				rareNumber=nrs[i];
+	}
+	private Telephone[] getFreeTele(Telephone[] nrs){
+		Vector freeTele = new Vector();
+		for(int i=0; i<nrs.length;i++){
+			if(nrs[i].getState().equals(CallProperties.TELE_FREE)){
+				freeTele.add(nrs[i]);
+			}
 		}
-		return rareNumber;
+			if(freeTele.size()==0)
+				return null;
+			else{
+				System.out.println("size of free tele =" +freeTele.size());
+				return (Telephone[]) freeTele.toArray(new Telephone[freeTele.size()]) ;
+			}
+
 	}
 	private void initializedTelephones() {
 		telephones= new Vector();
-//		telephones.add(new Telephone(CallProperties.SZEF_NUM));
-//		telephones.add(new Telephone(CallProperties.HR_NUM));
-		telephones.add(new Telephone(CallProperties.REKLAMACJA_1_NUM));
-		telephones.add(new Telephone(CallProperties.REKLAMACJA_2_NUM));
-		
+		telephones.add(new Telephone(CallProperties.SZEF_NAME,CallProperties.SZEF_NUM));
+		telephones.add(new Telephone(CallProperties.HR_NAME,CallProperties.HR_NUM));
+		telephones.add(new Telephone(CallProperties.REKLAMACJA_1_NAME,CallProperties.REKLAMACJA_1_NUM));
+		telephones.add(new Telephone(CallProperties.REKLAMACJA_2_NAME,CallProperties.REKLAMACJA_2_NUM));
+		System.out.println("zinicjalizowany telefony");
 	}
 	
 	private void logInTelephones(){
@@ -506,6 +535,16 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 		}
 		return tele;
 	}
+	private Telephone getTeleBySession(String sessionId){
+		Telephone tele = null;
+		for(int i=0;i<telephones.size();i++){
+			if(((Telephone) telephones.get(i)).getLog()==null)
+				continue;
+			if(((Telephone) telephones.get(i)).getLog().getAlr().getSessionId().equals(sessionId))
+				tele=(Telephone) telephones.get(i);
+		}
+		return tele;
+	}
 	
 	
 
@@ -519,18 +558,6 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 			if (calls == null) 
 			{
 				this.labelStatus.setText("Waiting for call...");
-				
-				System.out.println("\tNo calls");
-				
-				try
-				{
-					log.getXmlPhoneSerwis().clearCurrentCall(log.getAlr().getSessionId());
-				}
-				catch(Exception w)
-				{
-					System.out.println("Wystapill jakis blad");
-					w.printStackTrace();
-				}
 			}
 			else {
 				for (int i = 0; i < calls.length; i++) {
@@ -561,7 +588,10 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 					if (calls[i].getState().toString().equals("ringingOutgoing"))
 					{
 						this.labelStatus.setText("SEKRETARKA - Transfering call to: "+calls[i].getNumber());
-						findTelephone(calls[i].getNumber()).setActivity(findTelephone(calls[i].getNumber()).getActivity()+1);
+						Telephone tele = findTelephone(calls[i].getNumber());
+						tele.setActivity(tele.getActivity()+1);
+						tele.setState(CallProperties.TELE_BUSY);
+						tele.setStatus("BUSY");
 						log.getXmlPhoneSerwis().transferCurrentCall(log.getAlr().getSessionId());
 					}
 					if ((calls[i].getCorrelator() != null) && (!calls[i].getCorrelator().equals(""))) {
@@ -575,10 +605,47 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 				
 			}
 		else{
-			for (int i = 0; i < calls.length; i++) {
-				//TODO tutaj sie wywala błąd
-				System.out.println("Call state jednego z numerów : "+ calls[i].getNumber());	
+			System.out.println("Połączenie do innych telefonów");
+			Telephone tele = getTeleBySession(sessionId);
+			if (calls == null) {
+				System.out.println("Brak połączeń");
+				
+				if(tele.getState().equals(CallProperties.TELE_BUSY)){
+					System.out.println("telefon "+tele.getNumber()+" "+tele.getName()+" zakończył połączenie");
+					tele.setState(CallProperties.TELE_FREE);
+					tele.setStatus("end call - free");
+				}
+			}else{
+				for (int i = 0; i < calls.length; i++) {
+					if (calls[i].getState().toString().equals("dialing")) 
+					{
+						tele.setStatus("dialing");
+					}
+					
+					if (calls[i].getState().toString().equals("waiting") || calls[i].getState().toString().equals("held"))
+					{
+						tele.setStatus("waiting or held");
+					}
+					if (calls[i].getState().toString().equals("ringingIncoming"))
+					{
+						tele.setStatus("ringingIncoming");
+					}
+					if (calls[i].getState().toString().equals("active"))
+					{
+						tele.setStatus("Conn established with number: "+calls[i].getNumber());
+					}
+					if (calls[i].getState().toString().equals("releasing"))
+					{
+						tele.setState(CallProperties.TELE_FREE);
+						tele.setStatus("releasing");
+					}
+					if (calls[i].getState().toString().equals("ringingOutgoing"))
+					{
+						
+					}
+				}
 			}
+
 			
 			
 		}

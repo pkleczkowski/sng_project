@@ -27,19 +27,16 @@ public class Loging {
 	}
 
 	public void logIn(String notifUrl) {
-		System.out.println("* zaloguj() 1");
 		logIntoApiFramework();
 		logIntoXmlPhone();
 		subscribe(notifUrl);
-		System.out.println("* zaloguj() 2");
 	}
 
 	private void logIntoApiFramework() {
-		System.out.println("** zalogujDoApiFramework() 1");
 		serviceInit();
 		try {
 			sessionId = xmlApiFramework.login(null, user, pass);
-			System.out.println("** zalogujDoApiFramework() 2");
+			System.out.println("** zalogujDoApiFramework()  - done");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -59,11 +56,10 @@ public class Loging {
 								FRAMEWORK_URL
 										+ "/api/services/2.2/XMLApiFramework?ApiSessionId="
 										+ sessionId));
-				System.out.println("*** inicjalizujSerwis() 2a");
 			} else {
 				xmlApiFramework = serwis.getXmlApiFramework(new URL(
 						FRAMEWORK_URL + "/api/services/2.2/XMLApiFramework"));
-				System.out.println("*** inicjalizujSerwis() 2b");
+				System.out.println("*** inicjalizujSerwis() -done");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -72,7 +68,6 @@ public class Loging {
 
 	// logowanie do Web Serwisu XMLPhone
 	private void logIntoXmlPhone() {
-		System.out.println("** zalogujDoXmlPhone() 1");
 		if (sessionId != null) {
 			XmlPhoneServiceLocator serwis = new XmlPhoneServiceLocator();
 			try {
@@ -80,23 +75,21 @@ public class Loging {
 						.getXmlPhone(new URL(FRAMEWORK_URL
 								+ "/api/services/2.2/XMLPhone?ApiSessionId="
 								+ sessionId));
-				System.out.println("** zalogujDoXmlPhone() 2");
 				alr = xmlPhoneSerwis.login();
-				System.out.println("** zalogujDoXmlPhone() 3");
+				
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			System.out.println("** zalogujDoXmlPhone() 4");
+			System.out.println("** zalogujDoXmlPhone() -done");
 		}
 	}
 
 	// aktywowanie pobierania stanu polaczen
 	private void subscribe(String notifUrl) {
-		System.out.println("** subskrybuj() 1");
 		if (xmlPhoneSerwis != null && notifUrl != null) {
 			try {
 				xmlPhoneSerwis.subscribe(alr.getSessionId(), notifUrl);
-				System.out.println("** subskrybuj() 2");
+				System.out.println("** subskrybuj() -done");
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -106,11 +99,9 @@ public class Loging {
 	public void logOut() {
 		try {
 			xmlPhoneSerwis.unsubscribe(alr.getSessionId());
-			System.out.println("* logOut() 1");
 			xmlPhoneSerwis.logout(alr.getSessionId());
-			System.out.println("* logOut() 2");
 			xmlApiFramework.logout();
-			System.out.println("* logOut() 3");
+			System.out.println("* logOut() -done");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
