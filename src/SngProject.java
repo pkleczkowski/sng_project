@@ -7,11 +7,11 @@
  */
 
 
-public class CallState 
+public class SngProject 
 {
 	public static void main(String[] argumenty)
 	{
-		GlownaRamka glownaRamka = new GlownaRamka();
+		Ramka glownaRamka = new Ramka();
 		glownaRamka.pack();
 		glownaRamka.setVisible(true);
 	}
