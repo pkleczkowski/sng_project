@@ -119,6 +119,7 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 	private JSeparator separator_10;
 	private JSeparator separator_11;
 	private JLabel label_10;
+	private JLabel emptylabel1;
 	//inicjalizacja modulu logowania i wylogowywania oraz stworzenie GUI
     public Ramka() 
     {
@@ -191,7 +192,7 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 		gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
 		panel_2.setLayout(gbl_panel_2);
 		
-		JLabel emptylabel1 = new JLabel("                    ");
+		emptylabel1 = new JLabel("                    ");
 		GridBagConstraints gbc_lblEmptylabel = new GridBagConstraints();
 		gbc_lblEmptylabel.insets = new Insets(0, 0, 5, 5);
 		gbc_lblEmptylabel.gridx = 0;
@@ -712,6 +713,7 @@ public class Ramka extends JFrame implements XmlPhoneEvents, WindowListener, Act
 		log= new Loging("user" + CallProperties.SECRETARY_NUM, "123");
 		//logowanie pozostalych numerów
 		initializedTelephones();
+		emptylabel1.setText("                    ");
 	}
     
 
