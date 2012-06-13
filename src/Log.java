@@ -110,33 +110,11 @@ public class Log {
 		}
 	}
 	
-	private void zalogujDoXmlPhoneSetProgramming() {
-		System.out.println("DB log do XmlPhoneSetProgramming");
-		if(idSesji != null)
-		{
-			XmlPhoneSetProgrammingService pspService = new XmlPhoneSetProgrammingServiceLocator();
-			System.out.println("DB log do XmlPhoneSetProgramming 1");
-			try 
-			{
-				xmlPhoneSetProgrammingSerwis = pspService.getXmlPhoneSetProgramming(new URL(apiFwUrl + "/api/services/2.2/XMLPhoneSetProgramming?ApiSessionId=" + idSesji));
-				System.out.println("DB log do XmlPhoneSetProgramming 2");
-				System.out.println(xmlPhoneSetProgrammingSerwis.getStaticState().getForwardState().getType().toString());
-				System.out.println("DB log do XmlPhoneSetProgramming 3");
-			}
-			catch(Exception w) 
-			{	
-				System.out.println("Blad przy wyciaganiu ID xml phone programming");
-				System.out.println(w.toString());
-				System.out.println(xmlPhoneSetProgrammingSerwis==null);
-			}
-		}
-		
-	}
 
 	public boolean zaloguj(){
 		boolean tmp = zalogujDoApiFramework();
 		zalogujDoXmlPhone();
-		zalogujDoXmlPhoneSetProgramming();
+		//zalogujDoXmlPhoneSetProgramming();
 		return tmp;
 	}
 	
@@ -228,14 +206,7 @@ public class Log {
 		this.pass = pass;
 	}
 	
-	public XmlPhoneSetProgramming getXmlPhoneSetProgramminSerwis() {
-		return xmlPhoneSetProgrammingSerwis;
-	}
 	
-	public void setXmlPhoneSetProgramminSerwis(
-			XmlPhoneSetProgramming xmlPhoneSetProgramminSerwis) {
-		this.xmlPhoneSetProgrammingSerwis = xmlPhoneSetProgramminSerwis;
-	}
 	
 	public AlcLogonResult getAlrXmlPhone() {
 		return alrXmlPhone;
@@ -243,15 +214,6 @@ public class Log {
 	
 	public void setAlrXmlPhone(AlcLogonResult alrXmlPhone) {
 		this.alrXmlPhone = alrXmlPhone;
-	}
-	
-	public AlcLogonResult getAlrXmlPhoneSetProgramming() {
-		return alrXmlPhoneSetProgramming;
-	}
-	
-	public void setAlrXmlPhoneSetProgramming(
-			AlcLogonResult alrXmlPhoneSetProgramming) {
-		this.alrXmlPhoneSetProgramming = alrXmlPhoneSetProgramming;
 	}
 	
 }
